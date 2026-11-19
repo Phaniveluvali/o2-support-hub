@@ -36,7 +36,7 @@ spec:
           command: ["sh", "-c", "until nc -z db 5432; do echo waiting for db; sleep 2; done"]
       containers:
         - name: api
-          image: docker.io/library/o2-support-api:v1.0.0
+          image: docker.io/library/o2-support-api:v1.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4000

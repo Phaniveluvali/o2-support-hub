@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: docker.io/library/o2-support-web:v1.0.0
+          image: docker.io/library/o2-support-web:v1.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
