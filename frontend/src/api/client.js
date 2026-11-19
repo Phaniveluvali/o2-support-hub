@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Same-origin API (Vite proxy in dev, reverse proxy in production) so the session cookie is first-party.
-export const api = axios.create({ baseURL: `${import.meta.env.BASE_URL}api`, withCredentials: true, timeout: 30000 });
+export const api = axios.create({ baseURL: '/api', withCredentials: true, timeout: 30000 });
 let csrf = '';
 export const setCsrf = (t) => { csrf = t || ''; };
 

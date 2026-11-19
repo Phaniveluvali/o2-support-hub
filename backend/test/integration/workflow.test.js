@@ -6,7 +6,10 @@ import { ApiClient } from '../../scripts/api-client.js';
 
 let srv, base, A, B, admin, mgr, dev, dev2, cust, otherCust, bAdmin, project, contoso, fabrikam, task1, task2, secretTask, ticket;
 const today = new Date().toISOString().slice(0, 10);
-const plus = (n) => { const d = new Date(); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+// Dates are counted from the next Wednesday (today when it is one), so expectations never land on a weekend
+// that the scheduler would move to Monday, whatever day the tests run.
+const BASE = (() => { const d = new Date(); d.setUTCDate(d.getUTCDate() + ((3 - d.getUTCDay() + 7) % 7)); return d; })();
+const plus = (n) => { const d = new Date(BASE); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
 beforeAll(async () => {
   await resetDb();
@@ -121,20 +124,26 @@ describe('4. modules, tasks, dates, dependencies, assignments', () => {
     await mgr.patch(`/api/projects/${project.id}/work-items/${task1.id}`, { assigneeId: dev.userId, version: fresh.version });
     task2 = await mgr.post(`/api/projects/${project.id}/work-items`, { type: 'TASK', title: 'UI', parentId: mod.id, plannedStart: plus(2), plannedFinish: plus(6), estimateHours: 10, assigneeId: dev2.userId });
     const dep = await mgr.post(`/api/projects/${project.id}/dependencies`, { predecessorId: task1.id, successorId: task2.id });
-    expect(dep.conflict).not.toBeNull(); // task2 starts before task1 finishes: flagged, not silently moved
+    // task2 started before task1 finished: linking them moves task2 straight after task1 (same length)
+    expect(dep.rescheduled.moved.map((m) => m.id)).toContain(task2.id);
     await expectStatus(mgr.post(`/api/projects/${project.id}/dependencies`, { predecessorId: task2.id, successorId: task1.id }), 400);
     await expectStatus(dev.post(`/api/projects/${project.id}/dependencies`, { predecessorId: task1.id, successorId: task2.id }), 403);
+    const t1 = await mgr.get(`/api/projects/${project.id}/work-items/${task1.id}`);
     const t2 = await mgr.get(`/api/projects/${project.id}/work-items/${task2.id}`);
-    expect(t2.scheduleConflicts).toHaveLength(1);
+    expect(t2.plannedStart > t1.plannedFinish).toBe(true);
+    expect(t2.scheduleConflicts).toHaveLength(0);
+    const m = dep.rescheduled.moved.find((x) => x.id === task2.id);
+    const wd = (a, b) => { let n = 0; for (let d = new Date(`${a}T00:00:00Z`); d <= new Date(`${b}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + 1)) if (![0, 6].includes(d.getUTCDay())) n++; return n; };
+    expect(wd(m.to.start, m.to.finish)).toBe(wd(m.from.start, m.from.finish));
   });
   it('previews downstream impact and applies only after explicit confirmation', async () => {
     const before = await mgr.get(`/api/projects/${project.id}/work-items/${task2.id}`);
-    const pv = await mgr.post(`/api/projects/${project.id}/schedule/preview`, { itemId: task1.id, plannedStart: plus(1), plannedFinish: plus(4) });
+    const pv = await mgr.post(`/api/projects/${project.id}/schedule/preview`, { itemId: task1.id, plannedStart: plus(1), plannedFinish: plus(8) });
     expect(pv.moves.map((m) => m.id)).toContain(task2.id);
     const still = await mgr.get(`/api/projects/${project.id}/work-items/${task2.id}`);
     expect(still.plannedStart).toBe(before.plannedStart); // preview persisted nothing
-    await expectStatus(mgr.post(`/api/projects/${project.id}/schedule/apply`, { itemId: task1.id, plannedStart: plus(1), plannedFinish: plus(4), includeDownstream: true, expectedMoves: [] }), 409);
-    await mgr.post(`/api/projects/${project.id}/schedule/apply`, { itemId: task1.id, plannedStart: plus(1), plannedFinish: plus(4), includeDownstream: true, expectedMoves: pv.moves.map((m) => ({ id: m.id, start: m.to.start, finish: m.to.finish })) });
+    await expectStatus(mgr.post(`/api/projects/${project.id}/schedule/apply`, { itemId: task1.id, plannedStart: plus(1), plannedFinish: plus(8), includeDownstream: true, expectedMoves: [] }), 409);
+    await mgr.post(`/api/projects/${project.id}/schedule/apply`, { itemId: task1.id, plannedStart: plus(1), plannedFinish: plus(8), includeDownstream: true, expectedMoves: pv.moves.map((m) => ({ id: m.id, start: m.to.start, finish: m.to.finish })) });
     const after = await mgr.get(`/api/projects/${project.id}/work-items/${task2.id}`);
     expect(after.plannedStart).toBe(pv.moves.find((m) => m.id === task2.id).to.start);
     expect(after.scheduleConflicts).toHaveLength(0);

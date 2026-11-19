@@ -7,41 +7,32 @@ import { useAuth } from '../../auth/AuthContext.jsx';
 import { addDaysISO, fmtDate, labelize, todayISO } from '../../lib/format.js';
 import { ErrorBox, Field, Loading, Modal, Notice, Select, StatusBadge, useToast, Empty } from '../../components/ui.jsx';
 import { useProject } from './Workspace.jsx';
+import { useDateChange } from './DateChange.jsx';
+
+// Display-only working-day helpers (Mon–Fri) for the drag preview; the server applies holidays too.
+const isWD = (iso) => { const g = new Date(`${iso}T00:00:00Z`).getUTCDay(); return g !== 0 && g !== 6; };
+const wdBetween = (a, b) => { let n = 0; for (let d = a; d <= b; d = addDaysISO(d, 1)) if (isWD(d)) n++; return n; };
+const keepLength = (s, f, ns) => { const len = Math.max(1, wdBetween(s, f)); let d = ns; while (!isWD(d)) d = addDaysISO(d, 1); for (let k = 1; k < len; k++) { d = addDaysISO(d, 1); while (!isWD(d)) d = addDaysISO(d, 1); } return d; };
 
 const dayDiff = (a, b) => Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86400000);
 
-function RescheduleModal({ item, onClose, onApplied, initial }) {
-  const { project } = useProject();
-  const toast = useToast();
-  const [start, setStart] = useState(initial?.start || item.plannedStart || todayISO());
-  const [finish, setFinish] = useState(initial?.finish || item.plannedFinish || item.plannedStart || todayISO());
-  const [preview, setPreview] = useState(initial?.preview || null);
-  const [withDown, setWithDown] = useState(true);
-  const [err, setErr] = useState(null);
+function RescheduleModal({ item, onClose, dates }) {
+  const [start, setStart] = useState(item.plannedStart || todayISO());
+  const [finish, setFinish] = useState(item.plannedFinish || item.plannedStart || todayISO());
   const [busy, setBusy] = useState(false);
   const isMs = item.type === 'MILESTONE';
-  const doPreview = async () => { setErr(null); try { setPreview(await post(`/projects/${project.id}/schedule/preview`, { itemId: item.id, plannedStart: start, plannedFinish: isMs ? start : finish })); } catch (e) { setErr(e); } };
-  const apply = async () => {
-    setBusy(true); setErr(null);
-    try {
-      const r = await post(`/projects/${project.id}/schedule/apply`, { itemId: item.id, plannedStart: start, plannedFinish: isMs ? start : finish, includeDownstream: withDown && preview.moves.length > 0, expectedMoves: withDown ? preview.moves.map((m) => ({ id: m.id, start: m.to.start, finish: m.to.finish })) : [] });
-      toast(`${r.updated} task(s) moved`, 'success'); onApplied(); onClose();
-    } catch (e) { setErr(e); if (e.status === 409) setPreview(null); } finally { setBusy(false); }
+  const save = async () => {
+    setBusy(true);
+    const changes = isMs ? { plannedFinish: start } : { ...(start !== item.plannedStart && { plannedStart: start }), ...(finish !== item.plannedFinish && { plannedFinish: finish }) };
+    try { if (!Object.keys(changes).length || (await dates.change(item, changes))) onClose(); } finally { setBusy(false); }
   };
   return (
-    <Modal open onClose={onClose} title="Change dates" size="lg" footer={<><button className="btn btn-light" onClick={onClose}>Cancel</button>
-      {!preview ? <button className="btn btn-primary" onClick={doPreview}>Check what else moves</button> : <button className="btn btn-primary" disabled={busy} onClick={apply}>{busy ? 'Applying…' : `Save ${1 + (withDown ? preview.moves.length : 0)} change(s)`}</button>}</>}>
+    <Modal open onClose={onClose} title="Change dates" footer={<><button className="btn btn-light" onClick={onClose}>Cancel</button>
+      <button className="btn btn-primary" disabled={busy || (!isMs && finish < start)} onClick={save}>{busy ? 'Saving…' : 'Save'}</button></>}>
       <p className="mb-2 fw-medium">{item.title}</p>
-      <ErrorBox error={err} />
-      <div className="row"><div className="col-6"><Field label={isMs ? 'Date' : 'Start'}>{(id) => <input id={id} type="date" className="form-control" value={start} onChange={(e) => { setStart(e.target.value); setPreview(null); }} />}</Field></div>
-        {!isMs && <div className="col-6"><Field label="Due">{(id) => <input id={id} type="date" className="form-control" value={finish} min={start} onChange={(e) => { setFinish(e.target.value); setPreview(null); }} />}</Field></div>}</div>
-      {preview && (preview.moves.length === 0 ? <Notice>Nothing else needs to move.</Notice> : <>
-        <Notice tone="warn">{preview.moves.length} task(s) that wait for this one would now start too early. We can push them later and keep their length.</Notice>
-        <table className="table table-sm mt-2"><thead><tr><th>Task</th><th>Now</th><th>New dates</th></tr></thead>
-          <tbody>{preview.moves.map((m) => <tr key={m.id}><td><span className="mono text-muted">{project.code}-{m.number}</span> {m.title}</td><td className="small">{fmtDate(m.from.start)} → {fmtDate(m.from.finish)}</td><td className="small fw-semibold">{fmtDate(m.to.start)} → {fmtDate(m.to.finish)}</td></tr>)}</tbody></table>
-        <div className="form-check"><input className="form-check-input" type="checkbox" id="wd" checked={withDown} onChange={(e) => setWithDown(e.target.checked)} /><label className="form-check-label" htmlFor="wd">Move these too</label></div>
-        {!withDown && <div className="form-text">Only this task changes; the others will be flagged as starting too early.</div>}
-      </>)}
+      <div className="row"><div className="col-6"><Field label={isMs ? 'Date' : 'Start'}>{(id) => <input id={id} type="date" className="form-control" value={start} onChange={(e) => setStart(e.target.value)} />}</Field></div>
+        {!isMs && <div className="col-6"><Field label="Due" error={finish < start ? 'Must be on or after the start' : undefined}>{(id) => <input id={id} type="date" className="form-control" value={finish} min={start} onChange={(e) => setFinish(e.target.value)} />}</Field></div>}</div>
+      <Notice>Tasks that wait for this one move with it automatically and keep their length.</Notice>
     </Modal>
   );
 }
@@ -54,6 +45,8 @@ export function Timeline() {
   const analysis = useLoad(() => get(`/projects/${project.id}/schedule/analysis`), [project.id, items.data]);
   const baselines = useLoad(() => get(`/projects/${project.id}/baselines`), [project.id]);
   const [blId, setBlId] = useState('');
+  const [blTouched, setBlTouched] = useState(false);
+  useEffect(() => { const o = baselines.data?.data?.find((b) => b.kind === 'ORIGINAL'); if (o && !blTouched && !blId) setBlId(o.id); }, [baselines.data, blTouched, blId]);
   const cmp = useLoad(() => (blId ? get(`/projects/${project.id}/baselines/${blId}/compare`) : Promise.resolve(null)), [blId, items.data]);
   const [showCp, setShowCp] = useState(true);
   const [zoom, setZoom] = useState(20);
@@ -68,13 +61,14 @@ export function Timeline() {
   const dragRef = useRef(null);
   dragRef.current = drag;
   const live = useRef({});
+  const dates = useDateChange({ project, onChanged: () => { items.reload({ silent: true }); reloadProject(); } });
   useEffect(() => {
     if (!drag) return undefined;
     const move = (e) => {
       const d = dragRef.current; if (!d) return;
       const n = Math.round((e.clientX - d.x0) / live.current.zoom);
       let ds = d.s; let df = d.f;
-      if (d.mode === 'move') { ds = addDaysISO(d.s, n); df = addDaysISO(d.f, n); }
+      if (d.mode === 'move') { ds = addDaysISO(d.s, n); df = keepLength(d.s, d.f, ds); } // same working-day length (the server applies the project calendar)
       if (d.mode === 'start') { ds = addDaysISO(d.s, n); if (ds > df) ds = df; }
       if (d.mode === 'end') { df = addDaysISO(d.f, n); if (df < ds) df = ds; }
       setDrag({ ...d, ds, df, moved: d.moved || Math.abs(e.clientX - d.x0) > 3 });
@@ -85,22 +79,17 @@ export function Timeline() {
       const item = live.current.byId.get(d.id);
       if (!d.moved) { setMoving(item); return; }
       if (d.ds === d.s && d.df === d.f) return;
-      const finish = item.type === 'MILESTONE' ? d.ds : d.df;
+      // Same rules as everywhere else: moving keeps the working-day length; dependents are moved only after asking.
+      const changes = item.type === 'MILESTONE' ? { plannedFinish: d.ds } : d.mode === 'move' ? { plannedStart: d.ds } : d.mode === 'start' ? { plannedStart: d.ds, plannedFinish: d.f } : { plannedFinish: d.df };
       setBusy(true);
-      try {
-        const pv = await post(`/projects/${project.id}/schedule/preview`, { itemId: d.id, plannedStart: d.ds, plannedFinish: finish });
-        if (pv.moves.length) { setMoving({ ...item, _initial: { start: d.ds, finish, preview: pv } }); return; }
-        await post(`/projects/${project.id}/schedule/apply`, { itemId: d.id, plannedStart: d.ds, plannedFinish: finish, includeDownstream: false, expectedMoves: [] });
-        toast(`${item.title}: ${fmtDate(d.ds)} → ${fmtDate(finish)}`, 'success');
-        items.reload({ silent: true }); reloadProject();
-      } catch (err) { toast(err.message, 'error'); } finally { setBusy(false); }
+      try { await live.current.dates.change(item, changes); } finally { setBusy(false); }
     };
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up, { once: true });
     return () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drag?.id]);
   const laneXY = (e) => { const b = laneRef.current.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; };
-  live.current = { zoom, laneXY, byId: live.current.byId };
+  live.current = { zoom, laneXY, byId: live.current.byId, dates };
   const onLinkDown = (e, r) => { e.preventDefault(); e.stopPropagation(); setLink({ fromId: r.id, ...laneXY(e) }); };
   useEffect(() => {
     if (!link) return undefined;
@@ -172,12 +161,12 @@ export function Timeline() {
       <div className="filters">
         <div className="btn-group btn-group-sm" role="group" aria-label="Zoom">{[[34, 'Days'], [20, 'Weeks'], [7, 'Months']].map(([z, l]) => <button key={z} className={`btn btn-light ${zoom === z ? 'active' : ''}`} aria-pressed={zoom === z} onClick={() => setZoom(z)}>{l}</button>)}</div>
         <div className="form-check form-switch m-0"><input className="form-check-input" type="checkbox" id="cp" checked={showCp} onChange={(e) => setShowCp(e.target.checked)} /><label className="form-check-label small" htmlFor="cp">Show critical path</label></div>
-        <Select aria-label="Compare with baseline" value={blId} onChange={(v) => setBlId(v || '')} placeholder="Compare with a saved plan…" options={(baselines.data?.data || []).map((b) => ({ value: b.id, label: `${b.name} · ${fmtDate(b.createdAt)}` }))} />
-        {canSchedule && <button className="btn btn-sm btn-light" onClick={() => setBlName(`Plan ${fmtDate(today)}`)}><Save size={14} /> Save current plan</button>}
+        <Select aria-label="Compare with baseline" value={blId} onChange={(v) => { setBlTouched(true); setBlId(v || ''); }} placeholder="Compare with a saved plan…" options={(baselines.data?.data || []).map((b) => ({ value: b.id, label: b.kind === 'ORIGINAL' ? `🔒 ${b.name}` : `${b.kind === 'REVISION' ? 'Revision' : 'Snapshot'}: ${b.name} · ${fmtDate(b.createdAt)}` }))} />
+        {canSchedule && <button className="btn btn-sm btn-light" onClick={() => setBlName(`Snapshot ${fmtDate(today)}`)} title="Saves an extra copy for reference. The original plan is never replaced."><Save size={14} /> Save snapshot</button>}
       </div>
       <div className="small text-muted mb-2">{canSchedule ? 'Drag a bar to move it, drag its edges to change the dates, or drag the dot at its end onto another task to link them. Click an arrow to remove a link.' : 'Click a bar to open it.'}{busy ? ' Saving…' : ''}{analysis.data?.criticalPath && showCp ? ` Red bars are the critical path: if any of them slip, the end date slips (${analysis.data.criticalPath.durationDays} working days end to end).` : ''}</div>
       <ErrorBox error={items.error || analysis.error} />
-      <div className="d-flex gap-3 small text-muted my-2 flex-wrap"><span><span className="gantt-legend" style={{ display: 'inline-block', width: 14, height: 8, background: 'var(--steel-500)', borderRadius: 2 }} /> Task</span><span><span style={{ display: 'inline-block', width: 14, height: 8, background: 'var(--risk)', borderRadius: 2 }} /> Critical</span><span><span style={{ display: 'inline-block', width: 14, height: 8, background: 'var(--ok)', borderRadius: 2 }} /> Done</span><span><span style={{ display: 'inline-block', width: 14, height: 8, boxShadow: '0 0 0 2px var(--warn)', borderRadius: 2 }} /> Conflict</span>{blId && <span><span style={{ display: 'inline-block', width: 14, height: 4, background: 'var(--slate-300)' }} /> Baseline</span>}</div>
+      <div className="d-flex gap-3 small text-muted my-2 flex-wrap"><span><span className="gantt-legend" style={{ display: 'inline-block', width: 14, height: 8, background: 'var(--steel-500)', borderRadius: 2 }} /> Task</span><span><span style={{ display: 'inline-block', width: 14, height: 8, background: 'var(--risk)', borderRadius: 2 }} /> Critical</span><span><span style={{ display: 'inline-block', width: 14, height: 8, background: 'var(--ok)', borderRadius: 2 }} /> Done</span><span><span style={{ display: 'inline-block', width: 14, height: 8, boxShadow: '0 0 0 2px var(--warn)', borderRadius: 2 }} /> Conflict</span>{blId && <span><span style={{ display: 'inline-block', width: 14, height: 4, background: '#94a3b8' }} /> {baselines.data?.data?.find((b) => b.id === blId)?.kind === 'ORIGINAL' ? 'Original plan' : 'Saved plan'} (Var. = finish slip in working days)</span>}</div>
       <div className="gantt">
         <div className="gantt-left">
           <div className="gantt-head small-caps d-flex align-items-center px-2">Task{blId && <span className="ms-auto">Var.</span>}</div>
@@ -229,11 +218,12 @@ export function Timeline() {
         </div>
       </div>
       {dated.length === 0 && <div className="form-text mt-2">Add planned dates to work items to see them on the timeline.</div>}
-      {moving && <RescheduleModal item={moving} initial={moving._initial} onClose={() => setMoving(null)} onApplied={() => { items.reload(); reloadProject(); }} />}
+      {dates.dialog}
+      {moving && <RescheduleModal item={moving} dates={dates} onClose={() => setMoving(null)} />}
       {selDep && <div className="bulkbar rounded mt-2"><span>Link: <strong>{byId.get(selDep.predecessorId)?.key}</strong> {selDep.type === 'FS' ? 'must finish before' : selDep.type === 'SS' ? 'must start before' : selDep.type === 'FF' ? 'must finish before finishing' : 'starts before finishing'} <strong>{byId.get(selDep.successorId)?.key}</strong>{selDep.lagDays ? ` (+${selDep.lagDays}d lag)` : ''}</span>
         <button className="btn btn-sm btn-outline-danger ms-auto" onClick={() => removeDep(selDep)}>Remove link</button><button className="btn btn-sm btn-ghost" onClick={() => setSelDep(null)}>Close</button></div>}
-      <Modal open={blName != null} onClose={() => setBlName(null)} title="Save current plan" footer={<><button className="btn btn-light" onClick={() => setBlName(null)}>Cancel</button><button className="btn btn-primary" disabled={!blName?.trim()} onClick={saveBaseline}>Save</button></>}>
-        <p className="small text-muted">Saves today's dates and estimates so you can later compare what you planned with what happened.</p>
+      <Modal open={blName != null} onClose={() => setBlName(null)} title="Save a snapshot of the plan" footer={<><button className="btn btn-light" onClick={() => setBlName(null)}>Cancel</button><button className="btn btn-primary" disabled={!blName?.trim()} onClick={saveBaseline}>Save</button></>}>
+        <p className="small text-muted">Saves today's dates and estimates as an extra reference point. It does not replace the locked original plan, which stays the main comparison.</p>
         <Field label="Name">{(id) => <input id={id} className="form-control" value={blName || ''} onChange={(e) => setBlName(e.target.value)} />}</Field>
       </Modal>
     </>

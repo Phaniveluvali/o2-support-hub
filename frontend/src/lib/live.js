@@ -12,7 +12,7 @@ function setStatus(s) { status = s; statusListeners.forEach((f) => f(s)); }
 
 export function connectLive() {
   if (es || typeof EventSource === 'undefined') return;
-  es = new EventSource(`${import.meta.env.BASE_URL}api/events`, { withCredentials: true });
+  es = new EventSource('/api/events', { withCredentials: true });
   es.addEventListener('hello', () => setStatus('on'));
   es.onopen = () => setStatus('on');
   es.onmessage = (m) => { try { const evt = JSON.parse(m.data); listeners.forEach((f) => f(evt)); } catch { /* ignore malformed */ } };

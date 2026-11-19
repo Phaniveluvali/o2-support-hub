@@ -25,6 +25,7 @@ enum MembershipStatus {
 }
 
 enum ProjectRole {
+  DIRECTOR
   MANAGER
   MEMBER
   VIEWER
@@ -367,6 +368,7 @@ model Project {
   objectives        String?
   customerCompanyId String?       @db.Uuid
   managerId         String?       @db.Uuid
+  directorId        String?       @db.Uuid
   status            ProjectStatus @default(DRAFT)
   priority          Priority      @default(MEDIUM)
   health            Health        @default(GREEN)
@@ -382,6 +384,12 @@ model Project {
   templateId        String?       @db.Uuid
   workItemSeq       Int           @default(0)
   version           Int           @default(1)
+  planApprovedAt    DateTime?     @db.Timestamptz(3)
+  planApprovedById  String?       @db.Uuid
+  planSubmittedAt   DateTime?     @db.Timestamptz(3)
+  planSubmittedById String?       @db.Uuid
+  planReturnedAt    DateTime?     @db.Timestamptz(3)
+  planReturnNote    String?
   createdAt         DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime      @updatedAt @db.Timestamptz(3)
 
@@ -460,6 +468,9 @@ model WorkItem {
   plannedFinish      DateTime?    @db.Date
   actualStart        DateTime?    @db.Date
   actualFinish       DateTime?    @db.Date
+  /// "Start no earlier than": set when the manager fixes a start date. Null = start as soon as the
+  /// tasks it waits for are finished (or at the project start when it waits for nothing).
+  startConstraint    DateTime?    @db.Date
   estimateHours      Decimal?     @db.Decimal(8, 2)
   percentComplete    Int          @default(0)
   customerVisible    Boolean      @default(false)
@@ -526,6 +537,9 @@ model Baseline {
   projectId   String         @db.Uuid
   name        String
   note        String?
+  /// ORIGINAL = the approved plan (one per project, locked by a database trigger); REVISION = re-plan after an approved change request; SNAPSHOT = informal save
+  kind            String         @default("SNAPSHOT")
+  changeRequestId String?        @db.Uuid
   createdById String         @db.Uuid
   createdAt   DateTime       @default(now()) @db.Timestamptz(3)
   project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -539,6 +553,11 @@ model BaselineItem {
   plannedStart  DateTime? @db.Date
   plannedFinish DateTime? @db.Date
   estimateHours Decimal?  @db.Decimal(8, 2)
+  title         String?
+  type          String?
+  assigneeId    String?   @db.Uuid
+  phaseId       String?   @db.Uuid
+  parentId      String?   @db.Uuid
   baseline      Baseline  @relation(fields: [baselineId], references: [id], onDelete: Cascade)
 
   @@unique([baselineId, workItemId])

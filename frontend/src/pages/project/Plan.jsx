@@ -1,0 +1,285 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Lock, CheckCircle2, AlertTriangle, XCircle, Plus, Flag, ClipboardCheck, GanttChart, Info, ArrowRight, ListChecks, Send, Undo2, Hourglass, UserCheck } from 'lucide-react';
+import { get, post } from '../../api/client.js';
+import { useLoad } from '../../lib/hooks.js';
+import { useLive, emitLocal } from '../../lib/live.js';
+import { fmtDate, fmtMoney } from '../../lib/format.js';
+import { Avatar, Card, ErrorBox, Field, Loading, Modal, Notice, useToast, fieldErrors, Empty } from '../../components/ui.jsx';
+import { TaskVarChip, DaysVar, diffText, verdict, TASK_GROUPS } from '../../lib/schedule.jsx';
+import { PlanBuilder } from './PlanBuilder.jsx';
+import { useProject } from './Workspace.jsx';
+
+/** Plan tab: build the plan → approve & lock it as the ORIGINAL plan → track the working plan against it. */
+export function PlanTab() {
+  const { project } = useProject();
+  const plan = useLoad(() => get(`/projects/${project.id}/plan`), [project.id, project.version]);
+  useLive((e) => e.type === 'work.changed' && e.projectId === project.id, () => plan.reload({ silent: true }), [project.id]);
+  if (plan.loading && !plan.data) return <Loading rows={8} />;
+  if (plan.error) return <ErrorBox error={plan.error} onRetry={plan.reload} />;
+  return plan.data.approved ? <PlanVsOriginal plan={plan.data} reload={plan.reload} /> : <BuildPlan plan={plan.data} reload={plan.reload} />;
+}
+
+// ---------------------------------------------------------------- Draft: build + approve
+function Steps({ approved, submitted }) {
+  const steps = [['Project details', true], ['Team', true], ['Build the plan', approved || submitted], ['Director approves & locks the plan', approved]];
+  return (
+    <div className="plan-steps">{steps.map(([l, done], i) => {
+      const current = !done && steps.slice(0, i).every((s) => s[1]);
+      return <div key={l} className={`ps ${done ? 'done' : current ? 'cur' : ''}`}><span className="n">{done ? <CheckCircle2 size={16} /> : i + 1}</span>{l}</div>;
+    })}</div>
+  );
+}
+
+function BuildPlan({ plan, reload }) {
+  const { project, reload: reloadProject } = useProject();
+  const toast = useToast();
+  const [modal, setModal] = useState(null); // 'submit' | 'approve' | 'return'
+  const [note, setNote] = useState('');
+  const [activate, setActivate] = useState(project.status === 'DRAFT');
+  const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const { checks, blockers, warnings, ready } = plan.readiness;
+  const open = (m) => { setNote(''); setErr(null); setModal(m); };
+  const run = async (path, body, msg) => {
+    setBusy(true); setErr(null);
+    try {
+      const r = await post(`/projects/${project.id}/plan/${path}`, body);
+      toast(typeof msg === 'function' ? msg(r) : msg, 'success'); setModal(null);
+      reloadProject(); reload(); emitLocal({ type: 'work.changed', projectId: project.id });
+    } catch (x) { setErr(x); } finally { setBusy(false); }
+  };
+  const n = checks.tasks + checks.milestones;
+  const dirName = plan.director?.name;
+  const waiting = plan.submitted;
+  return (
+    <>
+      <Steps approved={false} submitted={waiting} />
+      <div className="gov-strip">
+        <span><UserCheck size={14} /> Project manager builds the plan</span><ArrowRight size={13} className="text-muted" />
+        <span><Send size={14} /> Sends it to the project director</span><ArrowRight size={13} className="text-muted" />
+        <span><Lock size={14} /> {dirName || 'The director'} approves and locks it</span>
+      </div>
+      {waiting ? (
+        <div className="ready-bar wait">
+          <Hourglass size={18} className="flex-shrink-0" />
+          <div className="flex-grow-1">
+            <div className="fw-semibold">Waiting for {dirName || 'the project director'} to approve the plan</div>
+            <div className="small">Sent by {plan.submittedBy?.name || '—'} on {fmtDate(plan.submittedAt)} · {checks.tasks} tasks · {checks.milestones} milestones
+              {blockers.map((b) => <span key={b} className="text-danger ms-2"><XCircle size={13} /> {b}</span>)}
+              {plan.canApprove && !ready && <span className="ms-2 text-muted">— send it back so the manager can fix this.</span>}</div>
+          </div>
+          {plan.canApprove && <>
+            <button className="btn btn-light flex-shrink-0" onClick={() => open('return')}><Undo2 size={15} /> Send back</button>
+            <button className="btn btn-primary flex-shrink-0" disabled={!ready} onClick={() => open('approve')}><Lock size={15} /> Approve &amp; lock plan</button>
+          </>}
+          {plan.canWithdraw && <button className="btn btn-light flex-shrink-0" onClick={() => run('withdraw', {}, 'Plan taken back — you can change it and send it again')}><Undo2 size={15} /> Take back</button>}
+        </div>
+      ) : (
+        <div className={`ready-bar ${ready ? 'ok' : ''}`}>
+          <ClipboardCheck size={18} className="flex-shrink-0" />
+          <div className="flex-grow-1">
+            <div className="fw-semibold">{ready ? `The plan is ready to send to ${dirName || 'the project director'}` : n ? 'Not ready to send for approval yet' : 'Start by adding the first task below'}</div>
+            <div className="small">
+              {[`${checks.tasks} task${checks.tasks === 1 ? '' : 's'}`, `${checks.milestones} milestone${checks.milestones === 1 ? '' : 's'}`, `${checks.team} on the team`].join(' · ')}
+              {blockers.map((b) => <span key={b} className="text-danger ms-2"><XCircle size={13} /> {b}</span>)}
+              {warnings.map((w) => <span key={w} className="text-warning-emphasis ms-2"><AlertTriangle size={13} /> {w}</span>)}
+            </div>
+          </div>
+          {plan.canSubmit && <button className="btn btn-primary flex-shrink-0" disabled={!ready} onClick={() => open('submit')}><Send size={15} /> Send for approval</button>}
+        </div>
+      )}
+      {plan.returnNote && !waiting && <Notice tone="warn"><b>Sent back by the director{plan.returnedAt ? ` on ${fmtDate(plan.returnedAt)}` : ''}:</b> “{plan.returnNote}” Make the changes and send it again.</Notice>}
+      {!plan.canSubmit && !plan.canApprove && !waiting && <Notice>The project manager builds the plan and sends it to the project director for approval.</Notice>}
+      <PlanBuilder />
+      <div className="form-text mt-3">Prefer a spreadsheet? You can also edit everything in the <Link to="../tasks">Tasks</Link> table or Gantt chart, or import a CSV there. Once the director approves it, the plan is frozen as the <b>original plan</b> and every later change is compared with it.</div>
+
+      <Modal open={modal === 'submit'} onClose={() => setModal(null)} title={`Send the plan to ${dirName || 'the project director'}`}
+        footer={<><button className="btn btn-light" onClick={() => setModal(null)}>Cancel</button><button className="btn btn-primary" disabled={busy} onClick={() => run('submit', { note: note || undefined }, `Plan sent to ${dirName || 'the director'} for approval`)}><Send size={14} /> {busy ? 'Sending…' : 'Send for approval'}</button></>}>
+        <ErrorBox error={err} />
+        <p className="mb-2">{dirName || 'The project director'} will be asked to approve <b>{checks.tasks} tasks and {checks.milestones} milestones</b>. You can still adjust the plan while it waits, or take it back.</p>
+        {warnings.length > 0 && <Notice tone="warn">{warnings.join(' ')}</Notice>}
+        <Field label="Note to the director (optional)">{(id) => <textarea id={id} className="form-control" rows={2} placeholder="e.g. Agreed with the client in the kick-off meeting" value={note} onChange={(e) => setNote(e.target.value)} />}</Field>
+      </Modal>
+
+      <Modal open={modal === 'approve'} onClose={() => setModal(null)} title="Approve and lock the original plan"
+        footer={<><button className="btn btn-light" onClick={() => setModal(null)}>Cancel</button><button className="btn btn-primary" disabled={busy} onClick={() => run('approve', { note: note || undefined, activate }, (r) => `Plan approved — ${r.items} items locked as the original plan`)}><Lock size={14} /> {busy ? 'Locking…' : 'Approve & lock'}</button></>}>
+        <ErrorBox error={err} />
+        <p className="mb-2">This saves a permanent copy of the plan: <b>{checks.tasks} tasks and {checks.milestones} milestones</b> with their start and due dates, effort and assigned people.</p>
+        <ul className="small mb-3">
+          <li>The original plan <b>can never be edited or deleted</b>, not even by an administrator.</li>
+          <li>The team keeps updating tasks, dates and people as the project runs; that is the working plan.</li>
+          <li>The Plan tab, Gantt, project list and status report then show every task and the project as on time, ahead or delayed against the original.</li>
+        </ul>
+        {warnings.length > 0 && <Notice tone="warn">{warnings.join(' ')}</Notice>}
+        <Field label="Approval note (optional)">{(id) => <textarea id={id} className="form-control" rows={2} placeholder="e.g. Approved as agreed with the client" value={note} onChange={(e) => setNote(e.target.value)} />}</Field>
+        {project.status === 'DRAFT' && <div className="form-check"><input className="form-check-input" type="checkbox" id="act" checked={activate} onChange={(e) => setActivate(e.target.checked)} /><label className="form-check-label" htmlFor="act">Also start the project (status Active)</label></div>}
+      </Modal>
+
+      <Modal open={modal === 'return'} onClose={() => setModal(null)} title="Send the plan back to the project manager"
+        footer={<><button className="btn btn-light" onClick={() => setModal(null)}>Cancel</button><button className="btn btn-primary" disabled={busy || !note.trim()} onClick={() => run('return', { note: note.trim() }, 'Plan sent back to the project manager')}><Undo2 size={14} /> {busy ? 'Sending…' : 'Send back'}</button></>}>
+        <ErrorBox error={err} />
+        <Field label="What needs to change?">{(id) => <textarea id={id} className="form-control" rows={3} autoFocus placeholder="e.g. Add a UAT stage and move go-live after the client's freeze" value={note} onChange={(e) => setNote(e.target.value)} />}</Field>
+      </Modal>
+    </>
+  );
+}
+
+function WorkingPlanEditor() {
+  const { can, project } = useProject();
+  const [open, setOpen] = useState(false);
+  if (!can('work.schedule') || project.readOnly) return null;
+  return (
+    <Card className="mb-3" title={<span className="d-inline-flex align-items-center gap-2"><ListChecks size={16} /> Working plan</span>}
+      actions={<button className="btn btn-sm btn-light" aria-expanded={open} onClick={() => setOpen((o) => !o)}>{open ? 'Close' : 'Change lengths, links and owners'}</button>}>
+      {open ? <PlanBuilder compact /> : <div className="small text-muted">Change how long tasks take, what they wait for or who does them. Dates are recalculated and everything that waits moves with it; the original plan above never changes.</div>}
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------- Shared: status banner
+const BANNER_ICON = { ok: CheckCircle2, blue: CheckCircle2, warn: AlertTriangle, risk: XCircle, neutral: Info };
+
+/** The one place that answers "are we on time?" — used on Overview and on the Plan tab. */
+export function StatusBanner({ project: p, plan, burn, link = false }) {
+  const s = plan?.approved ? plan.summary : null;
+  const v = verdict(p, s, fmtDate);
+  const Icon = BANNER_ICON[v.tone] || Info;
+  const c = s?.counts || {};
+  const late = (c.OVERDUE || 0) + (c.DELAYED || 0);
+  const progress = p.progress == null ? null : Math.round(p.progress);
+  const expected = s && s.status !== 'COMPLETED' && s.plannedPct != null ? Math.round(s.plannedPct) : null;
+  const behind = expected != null && progress != null && s.spi != null && s.plannedPct >= 10 && s.spi < 0.95; // same rule as the status
+  const b = burn?.budget; const h = burn?.hours;
+  const over = b?.consumed != null && b.consumed > b.amount;
+  return (
+    <div className={`status-banner tone-${v.tone}`}>
+      <div className="sb-head">
+        <Icon size={26} className="sb-icon" />
+        <div className="flex-grow-1 min-w-0"><div className="sb-title">{v.title}</div><div className="sb-text">{v.text}</div></div>
+        {link && p.status !== 'CANCELLED' && <Link to="plan" className="btn btn-sm btn-light text-nowrap">{p.planApprovedAt ? 'Plan vs original' : 'Finish the plan'} <ArrowRight size={14} /></Link>}
+      </div>
+      <div className="sb-facts">
+        <div className="sb-fact">
+          <div className="k">Work done</div>
+          <div className="v">{progress == null ? '—' : `${progress}%`}</div>
+          <div className="bar"><span style={{ width: `${progress || 0}%` }} className={behind ? 'behind' : ''} />{expected != null && <i style={{ left: `${Math.min(100, expected)}%` }} title={`The approved plan expected ${expected}% by today`} />}</div>
+          <div className={`sub ${behind ? 'text-danger fw-semibold' : ''}`}>{expected != null ? `Plan expected ${expected}% by today` : s?.status === 'COMPLETED' ? 'All work finished' : 'Of all planned work'}</div>
+        </div>
+        <div className="sb-fact">
+          <div className="k">{s ? 'Planned end date' : 'Target end date'}</div>
+          <div className="v sm">{fmtDate(s?.originalFinish || p.plannedFinish)}</div>
+          {s && <div className={`sub ${s.finishVariance > 0 ? 'text-danger fw-semibold' : ''}`}>{s.status === 'COMPLETED' ? 'Finished' : 'Expected'}: {fmtDate(s.forecastFinish)}{s.finishVariance ? ` (${diffText(s.finishVariance)})` : ''}</div>}
+          {!s && p.workFinish && p.workFinish > p.plannedFinish && <div className="sub text-danger fw-semibold">The tasks currently end on {fmtDate(p.workFinish)} — after this date</div>}
+          {!s && p.workFinish && p.workFinish <= p.plannedFinish && <div className="sub">The tasks currently end on {fmtDate(p.workFinish)}</div>}
+        </div>
+        <div className="sb-fact">
+          {s ? <>
+            <div className="k">Late tasks</div>
+            <div className={`v ${late ? 'text-danger' : ''}`}>{late}</div>
+            <div className="sub">{late ? `${c.OVERDUE || 0} past due · ${c.DELAYED || 0} will finish late` : 'Every task is on time'}</div>
+          </> : <>
+            <div className="k">Open tasks</div>
+            <div className="v">{p.counts.open}</div>
+            <div className="sub">{p.counts.overdue ? `${p.counts.overdue} past their due date` : 'None past their due date'}</div>
+          </>}
+        </div>
+        <div className="sb-fact">
+          {b?.consumed != null ? <>
+            <div className="k">Budget</div>
+            <div className={`v sm ${over ? 'text-danger' : ''}`}>{fmtMoney(b.consumed, b.currency)} <span className="of">of {fmtMoney(b.amount, b.currency)}</span></div>
+            <div className="bar"><span style={{ width: `${Math.min(100, (b.consumed / b.amount) * 100)}%` }} className={over ? 'behind' : ''} /></div>
+            <div className={`sub ${over ? 'text-danger fw-semibold' : ''}`}>{over ? `Over budget by ${fmtMoney(b.consumed - b.amount, b.currency)}` : `${Math.round((b.consumed / b.amount) * 100)}% used · ${fmtMoney(b.amount - b.consumed, b.currency)} left`}</div>
+          </> : h ? <>
+            <div className="k">Hours</div>
+            <div className="v sm">{h.logged}h <span className="of">of {h.estimate}h estimated</span></div>
+            <div className="bar"><span style={{ width: `${h.estimate ? Math.min(100, (h.logged / h.estimate) * 100) : 0}%` }} /></div>
+            <div className="sub">{h.estimate ? `${Math.round((h.logged / h.estimate) * 100)}% of the estimate used` : 'No estimates yet'}</div>
+          </> : <><div className="k">Budget</div><div className="v sm text-muted">—</div><div className="sub">No budget set</div></>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- Approved: plan vs what is happening
+/** Two bars per row: grey = approved plan, coloured = now (expected or actual). */
+function PlanTimeline({ plan }) {
+  const s = plan.summary;
+  const rows = [{ id: 'all', name: 'Whole project', os: s.originalStart, of: s.originalFinish, cs: s.currentStart, cf: s.forecastFinish, v: s.finishVariance, done: s.status === 'COMPLETED', total: true },
+    ...plan.phases.filter((ph) => ph.originalFinish || ph.forecastFinish).map((ph) => ({ id: ph.id || 'none', name: ph.name, os: ph.originalStart, of: ph.originalFinish, cs: ph.currentStart, cf: ph.forecastFinish, v: ph.finishVariance, done: ph.done }))];
+  const today = new Date().toISOString().slice(0, 10);
+  const all = rows.flatMap((r) => [r.os, r.of, r.cs, r.cf]).filter(Boolean).concat(today).sort();
+  const t0 = new Date(`${all[0]}T00:00:00Z`).getTime(); const t1 = new Date(`${all.at(-1)}T00:00:00Z`).getTime() + 864e5;
+  const x = (d) => (d ? ((new Date(`${d}T00:00:00Z`).getTime() - t0) / (t1 - t0)) * 100 : null);
+  const months = []; { const m = new Date(t0); m.setUTCDate(1); m.setUTCMonth(m.getUTCMonth() + 1); while (m.getTime() < t1) { months.push(new Date(m)); m.setUTCMonth(m.getUTCMonth() + 1); } }
+  const tone = (r) => (r.v == null ? 'none' : r.v > 0 ? 'late' : r.v < 0 ? 'early' : 'ontime');
+  return (
+    <div className="ptl">
+      <div className="ptl-legend"><span><i className="sw plan" /> Approved plan</span><span><i className="sw ontime" /> Now — on time</span><span><i className="sw late" /> Now — late</span><span><i className="sw early" /> Now — early</span><span><i className="sw today" /> Today</span></div>
+      <div className="ptl-grid">
+        <div className="ptl-axis"><div />{<div className="ptl-track">{months.map((m) => <span key={m.toISOString()} style={{ left: `${x(m.toISOString().slice(0, 10))}%` }}>{m.toLocaleDateString(undefined, { month: 'short', year: m.getUTCMonth() === 0 ? '2-digit' : undefined })}</span>)}</div>}<div /></div>
+        {rows.map((r) => (
+          <div key={r.id} className={`ptl-row ${r.total ? 'total' : ''}`}>
+            <div className="ptl-name">{r.name}</div>
+            <div className="ptl-track">
+              {months.map((m) => <em key={m.toISOString()} style={{ left: `${x(m.toISOString().slice(0, 10))}%` }} />)}
+              <b className="today" style={{ left: `${x(today)}%` }} />
+              {r.of && <span className="bar plan" style={{ left: `${x(r.os || r.of)}%`, width: `${Math.max(0.8, x(r.of) - x(r.os || r.of) + 100 / ((t1 - t0) / 864e5))}%` }} title={`Approved plan: ${fmtDate(r.os)} – ${fmtDate(r.of)}`} />}
+              {r.cf && <span className={`bar now ${tone(r)}`} style={{ left: `${x(r.cs || r.cf)}%`, width: `${Math.max(0.8, x(r.cf) - x(r.cs || r.cf) + 100 / ((t1 - t0) / 864e5))}%` }} title={`${r.done ? 'Actual' : 'Now'}: ${fmtDate(r.cs)} – ${fmtDate(r.cf)}`} />}
+            </div>
+            <div className="ptl-diff">{r.done && (r.v ?? 0) <= 0 ? <span className="text-success fw-semibold">Done{r.v < 0 ? ', early' : ''}</span> : r.done ? <span className="text-warning-emphasis fw-semibold">Done, {diffText(r.v)}</span> : <DaysVar days={r.v} />}</div>
+          </div>))}
+      </div>
+    </div>
+  );
+}
+
+function PlanVsOriginal({ plan }) {
+  const { project, people, openItem } = useProject();
+  const burn = useLoad(() => get(`/projects/${project.id}/burnup`), [project.id, project.version]);
+  const c = plan.summary.counts;
+  const count = (g) => g[2].reduce((t, k) => t + (c[k] || 0), 0);
+  const [tab, setTab] = useState(() => (TASK_GROUPS.find((g) => count(g) > 0) || TASK_GROUPS[0])[0]);
+  const group = TASK_GROUPS.find((g) => g[0] === tab);
+  const name = (id) => people.find((m) => m.id === id)?.name;
+  const phaseName = new Map(project.phases.map((p) => [p.id, p.name]));
+  const rows = plan.items.filter((r) => group[2].includes(r.status))
+    .sort((a, b) => (tab === 'late' ? (b.finishVariance ?? -1) - (a.finishVariance ?? -1) : 0) || (a.originalFinish || a.currentFinish || '9').localeCompare(b.originalFinish || b.currentFinish || '9'));
+  return (
+    <>
+      <div className="locked-bar"><Lock size={15} /><span>Plan approved on <b>{fmtDate(plan.approvedAt)}</b> by <b>{plan.approvedBy?.name || '—'}</b>{plan.baseline.note ? <> — “{plan.baseline.note}”</> : null}. This approved plan is locked and can't be changed. Everything below compares it with what is happening now.</span></div>
+      <StatusBanner project={project} plan={plan} burn={burn.data} />
+      <Card title="Timeline: approved plan vs now" className="mb-3">
+        <PlanTimeline plan={plan} />
+      </Card>
+      <WorkingPlanEditor />
+      <Card title="Tasks compared with the approved plan" actions={<Link to="../tasks" className="small fw-semibold d-inline-flex align-items-center gap-1"><GanttChart size={14} /> Open the Gantt chart</Link>}>
+        <div className="seg-tabs mb-2" role="tablist">{TASK_GROUPS.map((g) => <button key={g[0]} role="tab" aria-selected={tab === g[0]} className={`${tab === g[0] ? 'on' : ''} ${g[0] === 'late' && count(g) ? 'alert' : ''}`} onClick={() => setTab(g[0])}>{g[1]} <span className="n">{count(g)}</span></button>)}</div>
+        <div className="small text-muted mb-2">{group[3]}</div>
+        {rows.length === 0 ? <Empty icon={CheckCircle2} title={tab === 'late' ? 'No late tasks — everything is on plan' : 'Nothing here'} /> : (
+          <div className="table-wrap"><table className="table align-middle cmp-table">
+            <thead><tr><th>Task</th><th>Owner</th><th>Planned finish</th><th>{tab === 'done' ? 'Finished on' : 'Expected finish'}</th><th>Difference</th><th>Status</th></tr></thead>
+            <tbody>{rows.map((r) => <tr key={r.id} className={r.status === 'REMOVED' ? 'removed' : ''}>
+              <td style={{ minWidth: 220 }}>{r.workStatus === 'DELETED' ? <span className="fw-medium">{r.title}</span> : <button className="btn btn-link p-0 text-start text-body fw-semibold" onClick={() => openItem(r.id)}>{r.type === 'MILESTONE' && <Flag size={13} className="text-warning me-1" />}{r.title}</button>}
+                <div className="small text-muted">{r.number ? `${project.code}-${r.number}` : ''}{phaseName.get(r.phaseId) ? ` · ${phaseName.get(r.phaseId)}` : ''}{r.type === 'MILESTONE' ? ' · milestone' : ''}</div>
+                {r.lateStart && <div className="small text-danger">Should have started on {fmtDate(r.originalStart)}</div>}</td>
+              <td className="small">{r.assigneeId ? <span className="d-inline-flex align-items-center gap-1"><Avatar sm name={name(r.assigneeId)} />{name(r.assigneeId)}</span> : <span className="text-muted">{r.type === 'MILESTONE' ? '—' : 'Not assigned'}</span>}
+                {r.originalAssigneeId && r.originalAssigneeId !== r.assigneeId && <div className="small text-muted">Planned: {name(r.originalAssigneeId) || 'someone else'}</div>}</td>
+              <td className="text-nowrap">{r.originalFinish ? fmtDate(r.originalFinish) : <span className="text-muted small">{r.status === 'ADDED' ? 'Not in the plan' : 'No date'}</span>}</td>
+              <td className="text-nowrap">{r.status === 'REMOVED' ? <span className="text-muted small">Removed</span> : r.workStatus === 'DONE' ? fmtDate(r.actualFinish || r.currentFinish) : r.forecastFinish ? fmtDate(r.forecastFinish) : '—'}
+                {r.status === 'OVERDUE' && r.type !== 'MILESTONE' && <div className="small text-muted">{r.percentComplete ? `${Math.round(r.percentComplete)}% done` : 'Not started'}</div>}</td>
+              <td>{['ADDED', 'REMOVED', 'NOT_SCHEDULED'].includes(r.status) ? <span className="text-muted">—</span> : <DaysVar days={r.finishVariance} />}</td>
+              <td><TaskVarChip status={r.status} /></td></tr>)}</tbody></table></div>)}
+      </Card>
+      <details className="mt-3 small text-muted explain"><summary><Info size={13} /> How is this worked out?</summary>
+        <ul className="mt-2 mb-0">
+          <li><b>Approved plan</b> = the dates, effort and people saved when the plan was approved. It never changes.</li>
+          <li><b>Expected finish</b> = the date a task is planned to finish now. If a task is unfinished and its date has passed, we expect it no earlier than today.</li>
+          <li><b>Difference</b> is counted in working days (weekends and holidays are skipped).</li>
+          <li><b>Plan expected X% by today</b> = how much of the approved work should be done today if everything had gone to plan (weighted by estimated hours).</li>
+          <li>Project status: <b>Running late</b> if the end date is more than 5 days late or the work done is well behind the plan; <b>At risk</b> if the end date moves at all, a task is late, or work done is a little behind; <b>Ahead of schedule</b> if it will finish early. New tasks added later don't count, so they can't hide a delay.</li>
+        </ul></details>
+    </>
+  );
+}

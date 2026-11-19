@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
-import { parse, listQuery, pageArgs, paged, dateOnly, toDate, fmtDate, uuid, orderBy } from '../lib/http.js';
+import { parse, listQuery, pageArgs, paged, dateOnly, toDate, fmtDate, uuid, orderBy, partialNoDefaults } from '../lib/http.js';
 import { badRequest, conflict, notFound, forbidden } from '../lib/errors.js';
 import { requireOrg, projectAccess, visibleProjectsWhere } from '../policies/access.js';
 import * as S from '../policies/serializers.js';
@@ -11,6 +11,11 @@ import { loadCalendar, toWorkCalendar } from '../services/calendars.js';
 import { projectProgress, projectCalendar, loadSchedule } from '../services/projectData.js';
 import { workingDaysBetween, nextWorkingDay, addWorkingDays } from '../domain/calendar.js';
 import { PROJECT_TRANSITIONS, READ_ONLY_PROJECT } from '../domain/workflow.js';
+import { planVariance, scheduleSummary, originalBaseline } from '../services/planVariance.js';
+import { reschedule } from '../services/autoSchedule.js';
+
+// Built-in starting point for new projects: four plain stages, no preset milestones.
+const SIMPLE_TEMPLATE = { id: 'simple', name: 'Simple stages', phases: ['Plan', 'Build', 'Test', 'Close'].map((name, i) => ({ name, sortOrder: i, durationDays: [2, 5, 2, 1][i], completionCriteria: null, milestones: [], deliverables: [] })) };
 
 const r = Router();
 const enumP = z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
@@ -18,7 +23,8 @@ const enumH = z.enum(['GREEN', 'AMBER', 'RED']);
 
 r.get('/', async (req, res) => {
   const q = parse(listQuery.extend({ status: z.string().optional(), customerCompanyId: uuid.optional(), health: enumH.optional() }), req.query);
-  const statuses = q.status?.split(',').filter(Boolean);
+  const PROJECT_STATUSES = ['DRAFT', 'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED', 'ARCHIVED'];
+  const statuses = q.status?.split(',').map((x) => x.trim().toUpperCase()).filter((x) => PROJECT_STATUSES.includes(x));
   const where = { ...visibleProjectsWhere(req.auth), ...(statuses?.length && { status: { in: statuses } }), ...(q.health && { health: q.health }),
     ...(q.customerCompanyId && { customerCompanyId: q.customerCompanyId }),
     ...(q.q && { OR: [{ name: { contains: q.q, mode: 'insensitive' } }, { code: { contains: q.q, mode: 'insensitive' } }] }) };
@@ -36,8 +42,10 @@ r.get('/', async (req, res) => {
     const access = { isCustomer: req.auth.isCustomer, role: req.auth.orgRole === 'ADMIN' ? 'ADMIN' : undefined, can: () => false };
     const vis = (req.auth.isCustomer ? items.filter((i) => i.customerVisible) : items).filter((i) => i.type !== 'MODULE');
     const open = vis.filter((i) => !['DONE', 'CANCELLED'].includes(i.status));
-    out.push(S.project(p, access, { progress: roll.project.percent, milestones: roll.milestones, customerName: p.customerCompany?.name ?? null, managerName: mgr.get(p.managerId) ?? null,
-      ...(!req.auth.isCustomer && { teamSize: p._count.members }), counts: { total: vis.length, open: open.length, overdue: open.filter((i) => i.plannedFinish && i.plannedFinish < today).length } }));
+    // Once the plan is approved, "progress" means work done on the approved plan (the same number the schedule status uses).
+    const sched = await scheduleSummary(p);
+    out.push(S.project(p, access, { progress: sched?.actualPct ?? roll.project.percent, milestones: roll.milestones, customerName: p.customerCompany?.name ?? null, managerName: mgr.get(p.managerId) ?? null,
+      ...(!req.auth.isCustomer && { teamSize: p._count.members, planApprovedAt: p.planApprovedAt, schedule: sched }), counts: { total: vis.length, open: open.length, overdue: open.filter((i) => i.plannedFinish && i.plannedFinish < today).length } }));
   }
   res.json(paged(out, total, q));
 });
@@ -46,15 +54,22 @@ const createBody = z.object({
   name: z.string().trim().min(2).max(160), code: z.string().trim().toUpperCase().regex(/^[A-Z][A-Z0-9]{1,9}$/, '2–10 letters/digits, starting with a letter'),
   description: z.string().max(5000).optional().nullable(), objectives: z.string().max(5000).optional().nullable(),
   customerCompanyId: uuid.optional().nullable(), customerContactIds: z.array(uuid).max(50).default([]),
-  managerId: uuid, teamMemberIds: z.array(uuid).max(200).default([]),
+  managerId: uuid, directorId: uuid.optional().nullable(), teamMemberIds: z.array(uuid).max(200).default([]),
   // Richer team selection from the project wizard: role and allocation per person (overrides teamMemberIds).
   team: z.array(z.object({ userId: uuid, role: z.enum(['MANAGER', 'MEMBER', 'VIEWER']).default('MEMBER'), allocationPct: z.number().int().min(0).max(100).default(100) })).max(200).optional(),
   plannedStart: dateOnly, plannedFinish: dateOnly, priority: enumP.default('MEDIUM'), health: enumH.default('GREEN'),
   status: z.enum(['DRAFT', 'ACTIVE']).default('DRAFT'), calendarId: uuid.optional().nullable(), timezone: z.string().max(60).default('UTC'),
   budgetAmount: z.number().min(0).max(1e12).optional().nullable(), budgetCurrency: z.string().length(3).toUpperCase().optional().nullable(),
   billingEnabled: z.boolean().default(false), hourlyRate: z.number().min(0).max(1e6).optional().nullable(),
-  templateId: uuid.optional().nullable(), customerVisible: z.boolean().default(false),
+  templateId: z.union([uuid, z.literal('simple'), z.literal('none')]).optional().nullable(), customerVisible: z.boolean().default(false),
 });
+
+/** A project director is an active manager or administrator, and not the project manager (approvals need a second person). */
+async function checkDirector(orgId, directorId, managerId) {
+  if (directorId === managerId) throw badRequest('The project manager and the project director must be different people');
+  const m = await prisma.membership.findFirst({ where: { organizationId: orgId, userId: directorId, status: 'ACTIVE', role: { in: ['ADMIN', 'MANAGER'] } } });
+  if (!m) throw badRequest('The project director must be an active manager or administrator');
+}
 
 r.post('/', async (req, res) => {
   requireOrg(req.auth, 'project.create');
@@ -64,13 +79,14 @@ r.post('/', async (req, res) => {
   const orgId = req.auth.orgId;
   const mgr = await prisma.membership.findFirst({ where: { organizationId: orgId, userId: b.managerId, status: 'ACTIVE', role: { in: ['ADMIN', 'MANAGER'] } } });
   if (!mgr) throw badRequest('Project manager must be an active manager or administrator');
+  if (b.directorId) await checkDirector(orgId, b.directorId, b.managerId);
   if (b.customerCompanyId && !(await prisma.customerCompany.findFirst({ where: { id: b.customerCompanyId, organizationId: orgId } }))) throw badRequest('Unknown customer company');
   if (b.customerContactIds.length) {
     if (!b.customerCompanyId) throw badRequest('Choose a customer company before adding customer contacts');
     const n = await prisma.membership.count({ where: { organizationId: orgId, userId: { in: b.customerContactIds }, role: 'CUSTOMER', customerCompanyId: b.customerCompanyId, status: 'ACTIVE' } });
     if (n !== new Set(b.customerContactIds).size) throw badRequest('Customer contacts must be active users of the selected customer company');
   }
-  const roster = new Map((b.team ?? b.teamMemberIds.map((userId) => ({ userId, role: 'MEMBER', allocationPct: 100 }))).filter((t) => t.userId !== b.managerId).map((t) => [t.userId, t]));
+  const roster = new Map((b.team ?? b.teamMemberIds.map((userId) => ({ userId, role: 'MEMBER', allocationPct: 100 }))).filter((t) => t.userId !== b.managerId && t.userId !== b.directorId).map((t) => [t.userId, t]));
   const team = [...roster.keys()];
   if (team.length && (await prisma.membership.count({ where: { organizationId: orgId, userId: { in: team }, role: { in: ['ADMIN', 'MANAGER', 'EMPLOYEE'] }, status: 'ACTIVE' } })) !== team.length) {
     throw badRequest('Team members must be active internal users');
@@ -78,10 +94,11 @@ r.post('/', async (req, res) => {
   const calRow = await loadCalendar(prisma, b.calendarId, orgId);
   if (b.calendarId && !calRow) throw badRequest('Unknown calendar');
   const cal = toWorkCalendar(calRow);
-  const template = b.templateId
+  // 'simple' = four plain stages and nothing else; 'none' = an empty plan; otherwise a saved template
+  const template = b.templateId === 'none' ? null : b.templateId === 'simple' ? SIMPLE_TEMPLATE : b.templateId
     ? await prisma.projectTemplate.findFirst({ where: { id: b.templateId, organizationId: orgId }, include: { phases: { orderBy: { sortOrder: 'asc' } } } })
     : await prisma.projectTemplate.findFirst({ where: { organizationId: orgId, isDefault: true }, include: { phases: { orderBy: { sortOrder: 'asc' } } } });
-  if (b.templateId && !template) throw badRequest('Unknown template');
+  if (b.templateId && b.templateId !== 'none' && !template) throw badRequest('Unknown template');
 
   // Scale template phase durations to the project's working-day window, sequentially.
   const start = nextWorkingDay(b.plannedStart, cal);
@@ -102,18 +119,18 @@ r.post('/', async (req, res) => {
   const project = await prisma.$transaction(async (tx) => {
     const p = await tx.project.create({ data: {
       organizationId: orgId, name: b.name, code: b.code, description: b.description, objectives: b.objectives, customerCompanyId: b.customerCompanyId || null,
-      managerId: b.managerId, status: b.status, priority: b.priority, health: b.health, plannedStart: toDate(b.plannedStart), plannedFinish: toDate(b.plannedFinish),
+      managerId: b.managerId, directorId: b.directorId || null, status: b.status, priority: b.priority, health: b.health, plannedStart: toDate(b.plannedStart), plannedFinish: toDate(b.plannedFinish),
       calendarId: calRow?.id ?? null, timezone: b.timezone, budgetAmount: b.budgetAmount, budgetCurrency: b.budgetCurrency, billingEnabled: b.billingEnabled,
-      hourlyRate: b.hourlyRate, templateId: template?.id ?? null, customerVisible: b.customerVisible,
+      hourlyRate: b.hourlyRate, templateId: template?.id && template !== SIMPLE_TEMPLATE ? template.id : null, customerVisible: b.customerVisible,
     } });
-    const members = [{ userId: b.managerId, role: 'MANAGER' }, ...[...roster.values()].map((t) => ({ userId: t.userId, role: t.role, allocationPct: t.allocationPct })), ...b.customerContactIds.map((userId) => ({ userId, role: 'CUSTOMER' }))];
-    if (req.auth.userId !== b.managerId && req.auth.orgRole === 'MANAGER' && !team.includes(req.auth.userId)) members.push({ userId: req.auth.userId, role: 'MANAGER' });
+    const members = [{ userId: b.managerId, role: 'MANAGER' }, ...(b.directorId ? [{ userId: b.directorId, role: 'DIRECTOR' }] : []), ...[...roster.values()].map((t) => ({ userId: t.userId, role: t.role, allocationPct: t.allocationPct })), ...b.customerContactIds.map((userId) => ({ userId, role: 'CUSTOMER' }))];
+    if (req.auth.userId !== b.managerId && req.auth.userId !== b.directorId && req.auth.orgRole === 'MANAGER' && !team.includes(req.auth.userId)) members.push({ userId: req.auth.userId, role: 'MANAGER' });
     await tx.projectMember.createMany({ data: members.map((m) => ({ ...m, projectId: p.id })), skipDuplicates: true });
     let seq = 0;
     for (const [i, ph] of phasePlan.entries()) {
       const phase = await tx.phase.create({ data: { projectId: p.id, name: ph.t.name, sortOrder: i, ownerId: b.managerId, plannedStart: toDate(ph.start), plannedFinish: toDate(ph.finish), completionCriteria: ph.t.completionCriteria } });
       for (const [j, m] of ph.t.milestones.entries()) {
-        await tx.workItem.create({ data: { projectId: p.id, phaseId: phase.id, type: 'MILESTONE', number: ++seq, title: m, plannedStart: toDate(ph.finish), plannedFinish: toDate(ph.finish), customerVisible: b.customerVisible, sortOrder: 1000 + j, createdById: req.auth.userId } });
+        await tx.workItem.create({ data: { projectId: p.id, phaseId: phase.id, type: 'MILESTONE', number: ++seq, title: m, plannedStart: toDate(ph.finish), plannedFinish: toDate(ph.finish), startConstraint: toDate(ph.finish), customerVisible: b.customerVisible, sortOrder: 1000 + j, createdById: req.auth.userId } });
       }
       for (const d of ph.t.deliverables) await tx.deliverable.create({ data: { projectId: p.id, phaseId: phase.id, name: d, dueDate: toDate(ph.finish) } });
     }
@@ -122,14 +139,15 @@ r.post('/', async (req, res) => {
     await notify(tx, { orgId, userIds: members.filter((m) => m.role !== 'CUSTOMER').map((m) => m.userId), exclude: req.auth.userId, type: 'project.added', title: `You were added to ${p.code} · ${p.name}`, link: `/projects/${p.id}` });
     return p;
   });
-  res.status(201).json(S.project(project, await projectAccess(req.auth, project.id)));
+  await reschedule(project.id);
+  res.status(201).json(S.project(await prisma.project.findUnique({ where: { id: project.id } }), await projectAccess(req.auth, project.id)));
 });
 
 async function projectDetail(req, access) {
   const p = access.project;
   const { r: roll, items } = await projectProgress(p.id);
   const phases = await prisma.phase.findMany({ where: { projectId: p.id, ...(access.isCustomer && { customerVisible: true }) }, orderBy: { sortOrder: 'asc' } });
-  const members = await prisma.projectMember.findMany({ where: { projectId: p.id, ...(access.isCustomer && { role: { in: ['MANAGER', 'CUSTOMER'] } }) }, include: { user: true } });
+  const members = await prisma.projectMember.findMany({ where: { projectId: p.id, ...(access.isCustomer && { role: { in: ['DIRECTOR', 'MANAGER', 'CUSTOMER'] } }) }, include: { user: true } });
   const [customer, calendar] = await Promise.all([
     p.customerCompanyId ? prisma.customerCompany.findUnique({ where: { id: p.customerCompanyId } }) : null,
     access.internal ? loadCalendar(prisma, p.calendarId, p.organizationId) : null,
@@ -137,14 +155,25 @@ async function projectDetail(req, access) {
   const today = new Date().toISOString().slice(0, 10);
   const visible = access.isCustomer ? items.filter((i) => i.customerVisible) : items;
   const open = visible.filter((i) => !['DONE', 'CANCELLED'].includes(i.status));
+  const sched = await scheduleSummary(p);
   return S.project(p, access, {
-    progress: roll.project.percent, progressMethod: roll.project.method, milestones: roll.milestones,
+    progress: sched?.actualPct ?? roll.project.percent, progressMethod: sched ? 'APPROVED_PLAN' : roll.project.method, milestones: roll.milestones,
     customerName: customer?.name ?? null, calendarName: calendar?.name ?? null,
-    phases: phases.map((ph) => S.phase(ph, access, roll.phase(ph.id).percent)),
+    // A phase's dates are the span of its scheduled work, so they always match the tasks (stored dates only when it has none).
+    phases: phases.map((ph) => {
+      const own = items.filter((i) => i.phaseId === ph.id && i.status !== 'CANCELLED' && i.type !== 'MODULE');
+      const starts = own.map((i) => i.plannedStart || i.plannedFinish).filter(Boolean).sort(); const finishes = own.map((i) => i.plannedFinish || i.plannedStart).filter(Boolean).sort();
+      const out = S.phase(ph, access, roll.phase(ph.id).percent);
+      return starts.length ? { ...out, plannedStart: starts[0], plannedFinish: finishes.at(-1), datesFrom: 'tasks' } : { ...out, datesFrom: 'phase' };
+    }),
+    ...(() => { const live = items.filter((i) => i.status !== 'CANCELLED' && i.type !== 'MODULE');
+      const st = live.map((i) => i.plannedStart || i.plannedFinish).filter(Boolean).sort(); const fi = live.map((i) => i.plannedFinish || i.plannedStart).filter(Boolean).sort();
+      return { workStart: st[0] ?? null, workFinish: fi.at(-1) ?? null }; })(),
     members: members.map((m) => ({ ...S.publicUser(m.user), role: m.role, title: m.user.title, ...(access.internal && { email: m.user.email, department: m.user.department, allocationPct: m.allocationPct }) })),
     counts: { items: visible.length, open: open.length, overdue: open.filter((i) => i.plannedFinish && i.plannedFinish < today).length,
       ...(access.internal && { blocked: open.filter((i) => i.status === 'BLOCKED').length }) },
     readOnly: READ_ONLY_PROJECT.has(p.status),
+    ...(access.internal && { planApprovedAt: p.planApprovedAt, planSubmittedAt: p.planSubmittedAt, schedule: sched }),
   });
 }
 
@@ -153,9 +182,8 @@ r.get('/:projectId', async (req, res) => {
   res.json(await projectDetail(req, access));
 });
 
-const patchBody = createBody.pick({ name: true, description: true, objectives: true, priority: true, health: true, plannedStart: true, plannedFinish: true,
-  calendarId: true, timezone: true, budgetAmount: true, budgetCurrency: true, billingEnabled: true, hourlyRate: true, customerVisible: true, customerCompanyId: true, managerId: true })
-  .partial().extend({ version: z.number().int() });
+const patchBody = partialNoDefaults(createBody.pick({ name: true, description: true, objectives: true, priority: true, health: true, plannedStart: true, plannedFinish: true,
+  calendarId: true, timezone: true, budgetAmount: true, budgetCurrency: true, billingEnabled: true, hourlyRate: true, customerVisible: true, customerCompanyId: true, managerId: true, directorId: true })).extend({ version: z.number().int() });
 
 r.patch('/:projectId', async (req, res) => {
   const access = await projectAccess(req.auth, req.params.projectId);
@@ -169,17 +197,31 @@ r.patch('/:projectId', async (req, res) => {
   if (b.calendarId && !(await loadCalendar(prisma, b.calendarId, p.organizationId))) throw badRequest('Unknown calendar');
   if (b.managerId && !(await prisma.membership.findFirst({ where: { organizationId: p.organizationId, userId: b.managerId, role: { in: ['ADMIN', 'MANAGER'] }, status: 'ACTIVE' } }))) throw badRequest('Invalid project manager');
   if (b.customerCompanyId && !(await prisma.customerCompany.findFirst({ where: { id: b.customerCompanyId, organizationId: p.organizationId } }))) throw badRequest('Unknown customer company');
+  if (b.directorId !== undefined && b.directorId !== p.directorId && p.directorId && req.auth.orgRole !== 'ADMIN') throw forbidden('Only an administrator can change the project director');
+  if (b.directorId) await checkDirector(p.organizationId, b.directorId, b.managerId ?? p.managerId);
+  else if (b.managerId && b.managerId === p.directorId && b.directorId === undefined) throw badRequest('The project manager and the project director must be different people');
+  if (b.directorId === null && p.planSubmittedAt && !p.planApprovedAt) throw badRequest('The plan is waiting for the director. Choose another director instead of removing it.');
   const data = { ...b, ...(b.plannedStart && { plannedStart: toDate(b.plannedStart) }), ...(b.plannedFinish && { plannedFinish: toDate(b.plannedFinish) }), version: { increment: 1 } };
   await prisma.$transaction(async (tx) => {
     const n = await tx.project.updateMany({ where: { id: p.id, version }, data });
     if (!n.count) throw conflict('This project was changed by someone else. Reload to see the latest version.');
     if (b.managerId) await tx.projectMember.upsert({ where: { projectId_userId: { projectId: p.id, userId: b.managerId } }, create: { projectId: p.id, userId: b.managerId, role: 'MANAGER' }, update: { role: 'MANAGER' } });
+    if (b.directorId !== undefined && b.directorId !== p.directorId) {
+      // the previous director keeps read access; the new one gets the director role
+      if (p.directorId) await tx.projectMember.updateMany({ where: { projectId: p.id, userId: p.directorId, role: 'DIRECTOR' }, data: { role: 'VIEWER' } });
+      if (b.directorId) {
+        await tx.projectMember.upsert({ where: { projectId_userId: { projectId: p.id, userId: b.directorId } }, create: { projectId: p.id, userId: b.directorId, role: 'DIRECTOR', allocationPct: 0 }, update: { role: 'DIRECTOR' } });
+        await notify(tx, { orgId: p.organizationId, userIds: [b.directorId], exclude: req.auth.userId, type: 'project.added', title: `You are now the project director of ${p.code} · ${p.name}`, link: `/projects/${p.id}` });
+      }
+    }
     if (b.customerCompanyId !== undefined && b.customerCompanyId !== p.customerCompanyId) {
       // changing the customer removes contacts of the previous customer
       await tx.projectMember.deleteMany({ where: { projectId: p.id, role: 'CUSTOMER' } });
     }
     await audit(tx, req.auth, { action: 'project.updated', entityType: 'Project', entityId: p.id, projectId: p.id, metadata: { fields: Object.keys(b) } }, req.ip);
   });
+  // a new start date or calendar moves every task that is not fixed; in a draft the end follows the tasks
+  if (b.plannedStart || b.calendarId !== undefined || b.plannedFinish) await reschedule(p.id);
   res.json(await projectDetail(req, await projectAccess(req.auth, p.id)));
 });
 
@@ -196,6 +238,7 @@ r.post('/:projectId/status', async (req, res) => {
   const n = await prisma.project.updateMany({ where: { id: p.id, version }, data: { status, version: { increment: 1 } } });
   if (!n.count) throw conflict('This project was changed by someone else. Reload and try again.');
   await audit(prisma, req.auth, { action: 'project.status_changed', entityType: 'Project', entityId: p.id, projectId: p.id, metadata: { from: p.status, to: status, reason } }, req.ip);
+  await reschedule(p.id);
   res.json(await projectDetail(req, await projectAccess(req.auth, p.id)));
 });
 
@@ -204,6 +247,8 @@ r.put('/:projectId/members/:userId', async (req, res) => {
   const access = await projectAccess(req.auth, req.params.projectId);
   access.require('project.members');
   const { role, allocationPct } = parse(z.object({ role: z.enum(['MANAGER', 'MEMBER', 'VIEWER', 'CUSTOMER']), allocationPct: z.number().int().min(0).max(100).default(100) }), req.body);
+  if (req.params.userId === access.project.directorId) throw badRequest('This person is the project director. Change the director in the project settings first.');
+  if (req.params.userId === access.project.managerId && role !== 'MANAGER') throw badRequest('This person is the project manager. Choose a different project manager first.');
   const m = await prisma.membership.findFirst({ where: { organizationId: req.auth.orgId, userId: req.params.userId, status: 'ACTIVE' } });
   if (!m) throw notFound('User');
   if ((role === 'CUSTOMER') !== (m.role === 'CUSTOMER')) throw badRequest(role === 'CUSTOMER' ? 'Only customer users can be customer members' : 'Customer users can only be added as customer members');
@@ -219,6 +264,7 @@ r.delete('/:projectId/members/:userId', async (req, res) => {
   const access = await projectAccess(req.auth, req.params.projectId);
   access.require('project.members');
   if (req.params.userId === access.project.managerId) throw badRequest('Assign a different project manager first');
+  if (req.params.userId === access.project.directorId) throw badRequest('Assign a different project director first');
   await prisma.projectMember.deleteMany({ where: { projectId: access.project.id, userId: req.params.userId } });
   await audit(prisma, req.auth, { action: 'project.member_removed', entityType: 'Project', entityId: access.project.id, projectId: access.project.id, metadata: { userId: req.params.userId } }, req.ip);
   res.status(204).end();
@@ -246,14 +292,17 @@ r.post('/:projectId/clone', async (req, res) => {
     prisma.checklistItem.findMany({ where: { workItem: { projectId: src.id } } }),
   ]);
   const p = await prisma.$transaction(async (tx) => {
+    const newManager = req.auth.orgRole === 'MANAGER' ? req.auth.userId : src.managerId;
+    const newDirector = src.directorId && src.directorId !== newManager ? src.directorId : null;
     const np = await tx.project.create({ data: {
       organizationId: src.organizationId, name: b.name, code: b.code, description: src.description, objectives: src.objectives, customerCompanyId: src.customerCompanyId,
-      managerId: req.auth.orgRole === 'MANAGER' ? req.auth.userId : src.managerId, status: 'DRAFT', priority: src.priority, health: 'GREEN',
+      managerId: newManager, directorId: newDirector, status: 'DRAFT', priority: src.priority, health: 'GREEN',
       plannedStart: shiftDate(src.plannedStart, offset), plannedFinish: shiftDate(src.plannedFinish, offset), calendarId: src.calendarId, timezone: src.timezone,
       budgetAmount: src.budgetAmount, budgetCurrency: src.budgetCurrency, billingEnabled: src.billingEnabled, hourlyRate: src.hourlyRate, templateId: src.templateId,
       customerVisible: src.customerVisible, workItemSeq: src.workItemSeq,
     } });
-    const team = b.includeTeam ? members : members.filter((m) => m.userId === src.managerId);
+    const team = (b.includeTeam ? members : members.filter((m) => m.userId === src.managerId || m.userId === newDirector))
+      .map((m) => (m.role === 'DIRECTOR' && m.userId !== newDirector ? { ...m, role: 'VIEWER' } : m));
     const mgr = req.auth.orgRole === 'MANAGER' ? [{ userId: req.auth.userId, role: 'MANAGER', allocationPct: 100 }] : [];
     await tx.projectMember.createMany({ data: [...mgr, ...team].map((m) => ({ projectId: np.id, userId: m.userId, role: m.role, allocationPct: m.allocationPct })), skipDuplicates: true });
     const phaseMap = new Map();
@@ -267,7 +316,7 @@ r.post('/:projectId/clone', async (req, res) => {
       const n = await tx.workItem.create({ data: {
         projectId: np.id, phaseId: phaseMap.get(it.phaseId) ?? null, parentId: itemMap.get(it.parentId) ?? null, type: it.type, number: it.number, title: it.title,
         description: it.description, acceptanceCriteria: it.acceptanceCriteria, assigneeId: b.includeAssignees ? it.assigneeId : null, priority: it.priority,
-        plannedStart: shiftDate(it.plannedStart, offset), plannedFinish: shiftDate(it.plannedFinish, offset), estimateHours: it.estimateHours,
+        plannedStart: shiftDate(it.plannedStart, offset), plannedFinish: shiftDate(it.plannedFinish, offset), startConstraint: shiftDate(it.startConstraint, offset), estimateHours: it.estimateHours,
         customerVisible: it.customerVisible, labels: it.labels, sortOrder: it.sortOrder, createdById: req.auth.userId,
       } });
       itemMap.set(it.id, n.id);
@@ -355,7 +404,7 @@ r.patch('/:projectId/phases/:phaseId', async (req, res) => {
   access.require('phase.manage');
   const ph = await prisma.phase.findFirst({ where: { id: req.params.phaseId, projectId: access.project.id } });
   if (!ph) throw notFound('Phase');
-  const { version, ...b } = parse(phaseBody.partial().extend({ version: z.number().int() }), req.body);
+  const { version, ...b } = parse(partialNoDefaults(phaseBody).extend({ version: z.number().int() }), req.body);
   checkRange(b.plannedStart ?? fmtDate(ph.plannedStart), b.plannedFinish ?? fmtDate(ph.plannedFinish));
   const data = { ...b, version: { increment: 1 } };
   if ('plannedStart' in b) data.plannedStart = toDate(b.plannedStart);
@@ -389,11 +438,143 @@ r.delete('/:projectId/phases/:phaseId', async (req, res) => {
 });
 
 // ----- Baselines -----
+async function snapshotItems(db, projectId) {
+  const items = await db.workItem.findMany({ where: { projectId }, select: { id: true, title: true, type: true, assigneeId: true, phaseId: true, parentId: true, plannedStart: true, plannedFinish: true, estimateHours: true } });
+  return items.map(({ id, ...i }) => ({ workItemId: id, ...i }));
+}
+
+// ----- Original plan: build, approve & lock, compare -----
+// Before approval the plan is a draft the manager edits freely. Approving takes a snapshot of every task
+// (dates, effort, owner) as the ORIGINAL baseline, which the database refuses to change or delete afterwards.
+// The tasks themselves stay editable: that is the working plan, always compared with the original.
+async function planReadiness(project) {
+  const [items, team] = await Promise.all([
+    prisma.workItem.findMany({ where: { projectId: project.id, status: { not: 'CANCELLED' } }, select: { type: true, assigneeId: true, plannedStart: true, plannedFinish: true, estimateHours: true } }),
+    prisma.projectMember.count({ where: { projectId: project.id, role: { in: ['MANAGER', 'MEMBER'] } } }),
+  ]);
+  const work = items.filter((i) => i.type === 'TASK' || i.type === 'SUBTASK');
+  const leaf = items.filter((i) => i.type !== 'MODULE');
+  const ps = fmtDate(project.plannedStart); const pf = fmtDate(project.plannedFinish);
+  const checks = {
+    tasks: work.length, milestones: items.filter((i) => i.type === 'MILESTONE').length, team,
+    undated: leaf.filter((i) => !i.plannedStart || !i.plannedFinish).length,
+    unassigned: work.filter((i) => !i.assigneeId).length,
+    unestimated: work.filter((i) => i.estimateHours == null).length,
+    outsideProject: leaf.filter((i) => (i.plannedStart && fmtDate(i.plannedStart) < ps) || (i.plannedFinish && fmtDate(i.plannedFinish) > pf)).length,
+  };
+  const blockers = [];
+  if (!project.directorId) blockers.push('Choose a project director in the project settings — the director approves the plan.');
+  if (!checks.tasks) blockers.push('Add at least one task.');
+  if (checks.undated) blockers.push(`${checks.undated} task(s)/milestone(s) have no start or due date.`);
+  const warnings = [];
+  if (checks.unassigned) warnings.push(`${checks.unassigned} task(s) have nobody assigned.`);
+  if (checks.unestimated) warnings.push(`${checks.unestimated} task(s) have no effort estimate — progress will weigh all tasks equally.`);
+  if (checks.outsideProject) warnings.push(`${checks.outsideProject} item(s) fall outside the project dates.`);
+  if (!checks.milestones) warnings.push('No milestones yet — key dates make delays easier to spot.');
+  return { checks, blockers, warnings, ready: blockers.length === 0 };
+}
+
+const userName = async (id) => (id ? prisma.user.findUnique({ where: { id }, select: { id: true, name: true } }) : null);
+
+// The plan is approved in two steps: the project manager sends it to the project director, and the director
+// approves it (it is then locked as the original plan) or sends it back with a note.
+r.get('/:projectId/plan', async (req, res) => {
+  const access = await projectAccess(req.auth, req.params.projectId);
+  access.require('project.viewInternal');
+  const p = access.project;
+  const [approver, director, submitter] = await Promise.all([userName(p.planApprovedById), userName(p.directorId), userName(p.planSubmittedById)]);
+  const open = !READ_ONLY_PROJECT.has(p.status) && !p.planApprovedAt;
+  const out = {
+    approved: Boolean(p.planApprovedAt), approvedAt: p.planApprovedAt, approvedBy: approver, director,
+    submitted: Boolean(p.planSubmittedAt) && !p.planApprovedAt, submittedAt: p.planSubmittedAt, submittedBy: submitter,
+    returnedAt: p.planReturnedAt, returnNote: p.planReturnNote,
+    canSubmit: open && access.can('plan.submit') && !p.planSubmittedAt,
+    canWithdraw: open && access.can('plan.submit') && Boolean(p.planSubmittedAt),
+    // the director decides; an administrator can step in, but nobody approves a plan they sent themselves
+    canApprove: open && access.can('plan.approve') && Boolean(p.planSubmittedAt) && p.planSubmittedById !== req.auth.userId,
+  };
+  if (!p.planApprovedAt) return res.json({ ...out, readiness: await planReadiness(p) });
+  const v = await planVariance(p, { baselineId: req.query.baselineId || undefined });
+  res.json({ ...out, ...v });
+});
+
+const notOpen = (p) => { if (READ_ONLY_PROJECT.has(p.status)) throw conflict(`${p.status.toLowerCase()} projects are read-only`); if (p.planApprovedAt) throw conflict('The original plan is already approved and locked.'); };
+
+r.post('/:projectId/plan/submit', async (req, res) => {
+  const access = await projectAccess(req.auth, req.params.projectId);
+  access.require('plan.submit');
+  const p = access.project;
+  notOpen(p);
+  const b = parse(z.object({ note: z.string().max(2000).optional() }), req.body);
+  const readiness = await planReadiness(p);
+  if (!readiness.ready) throw badRequest(`The plan is not ready: ${readiness.blockers.join(' ')}`);
+  const n = await prisma.project.updateMany({ where: { id: p.id, planSubmittedAt: null, planApprovedAt: null }, data: { planSubmittedAt: new Date(), planSubmittedById: req.auth.userId, planReturnedAt: null, planReturnNote: null, version: { increment: 1 } } });
+  if (!n.count) throw conflict('The plan has already been sent for approval.');
+  await audit(prisma, req.auth, { action: 'plan.submitted', entityType: 'Project', entityId: p.id, projectId: p.id, metadata: { note: b.note ?? null, directorId: p.directorId } }, req.ip);
+  await notify(prisma, { orgId: req.auth.orgId, userIds: [p.directorId], exclude: req.auth.userId, type: 'plan.submitted', title: `${p.code}: ${req.auth.user.name} sent the plan for your approval`, body: b.note, link: `/projects/${p.id}/plan` });
+  res.json({ ok: true });
+});
+
+r.post('/:projectId/plan/withdraw', async (req, res) => {
+  const access = await projectAccess(req.auth, req.params.projectId);
+  access.require('plan.submit');
+  const p = access.project;
+  notOpen(p);
+  const n = await prisma.project.updateMany({ where: { id: p.id, planSubmittedAt: { not: null }, planApprovedAt: null }, data: { planSubmittedAt: null, planSubmittedById: null, version: { increment: 1 } } });
+  if (!n.count) throw conflict('The plan is not waiting for approval.');
+  await audit(prisma, req.auth, { action: 'plan.withdrawn', entityType: 'Project', entityId: p.id, projectId: p.id }, req.ip);
+  res.json({ ok: true });
+});
+
+r.post('/:projectId/plan/return', async (req, res) => {
+  const access = await projectAccess(req.auth, req.params.projectId);
+  access.require('plan.approve');
+  const p = access.project;
+  notOpen(p);
+  const b = parse(z.object({ note: z.string().trim().min(1, 'Say what needs to change').max(2000) }), req.body);
+  if (!p.planSubmittedAt) throw conflict('The plan is not waiting for approval.');
+  const n = await prisma.project.updateMany({ where: { id: p.id, planSubmittedAt: { not: null }, planApprovedAt: null }, data: { planSubmittedAt: null, planSubmittedById: null, planReturnedAt: new Date(), planReturnNote: b.note, version: { increment: 1 } } });
+  if (!n.count) throw conflict('The plan is not waiting for approval.');
+  await audit(prisma, req.auth, { action: 'plan.returned', entityType: 'Project', entityId: p.id, projectId: p.id, metadata: { note: b.note } }, req.ip);
+  const mgrs = await prisma.projectMember.findMany({ where: { projectId: p.id, role: 'MANAGER' }, select: { userId: true } });
+  await notify(prisma, { orgId: req.auth.orgId, userIds: mgrs.map((m) => m.userId), exclude: req.auth.userId, type: 'plan.returned', title: `${p.code}: plan sent back by ${req.auth.user.name}`, body: b.note, link: `/projects/${p.id}/plan` });
+  res.json({ ok: true });
+});
+
+r.post('/:projectId/plan/approve', async (req, res) => {
+  const access = await projectAccess(req.auth, req.params.projectId);
+  access.require('plan.approve');
+  const p = access.project;
+  if (READ_ONLY_PROJECT.has(p.status)) throw conflict(`${p.status.toLowerCase()} projects are read-only`);
+  const b = parse(z.object({ note: z.string().max(2000).optional(), activate: z.boolean().default(true) }), req.body);
+  const result = await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${p.id}))`;
+    const fresh = await tx.project.findUnique({ where: { id: p.id } });
+    if (fresh.planApprovedAt || (await originalBaseline(p.id, tx))) throw conflict('The original plan is already approved and locked.');
+    if (!fresh.planSubmittedAt) throw conflict('The project manager has not sent the plan for approval yet.');
+    if (fresh.planSubmittedById === req.auth.userId) throw forbidden('You sent this plan for approval, so someone else has to approve it.');
+    const readiness = await planReadiness(fresh);
+    if (!readiness.ready) throw badRequest(`The plan is not ready: ${readiness.blockers.join(' ')}`);
+    const items = await snapshotItems(tx, p.id);
+    const day = new Date().toISOString().slice(0, 10);
+    const bl = await tx.baseline.create({ data: { projectId: p.id, name: `Original plan (approved ${day})`, note: b.note, kind: 'ORIGINAL', createdById: req.auth.userId } });
+    await tx.baselineItem.createMany({ data: items.map((i) => ({ baselineId: bl.id, ...i })) });
+    const now = new Date();
+    await tx.project.update({ where: { id: p.id }, data: { planApprovedAt: now, planApprovedById: req.auth.userId, planReturnNote: null, version: { increment: 1 }, ...(b.activate && fresh.status === 'DRAFT' && { status: 'ACTIVE' }) } });
+    await audit(tx, req.auth, { action: 'plan.approved', entityType: 'Project', entityId: p.id, projectId: p.id, metadata: { baselineId: bl.id, items: items.length, note: b.note ?? null } }, req.ip);
+    const team = await tx.projectMember.findMany({ where: { projectId: p.id, role: { in: ['MANAGER', 'MEMBER'] } }, select: { userId: true } });
+    await notify(tx, { orgId: req.auth.orgId, userIds: team.map((t) => t.userId), exclude: req.auth.userId, type: 'plan.approved', title: `${p.code}: plan approved by ${req.auth.user.name} — ${items.length} items locked as the original plan`, link: `/projects/${p.id}/plan` });
+    return { baselineId: bl.id, items: items.length, approvedAt: now };
+  });
+  res.status(201).json(result);
+});
 r.get('/:projectId/baselines', async (req, res) => {
   const access = await projectAccess(req.auth, req.params.projectId);
   access.require('project.viewInternal');
   const rows = await prisma.baseline.findMany({ where: { projectId: access.project.id }, orderBy: { createdAt: 'desc' }, include: { _count: { select: { items: true } } } });
-  res.json({ data: rows.map((b) => ({ id: b.id, name: b.name, note: b.note, createdAt: b.createdAt, items: b._count.items })) });
+  const order = { ORIGINAL: 0, REVISION: 1, SNAPSHOT: 2 };
+  rows.sort((a, b) => order[a.kind] - order[b.kind] || b.createdAt - a.createdAt);
+  res.json({ data: rows.map((b) => ({ id: b.id, name: b.name, note: b.note, kind: b.kind, locked: b.kind === 'ORIGINAL', createdAt: b.createdAt, items: b._count.items })) });
 });
 
 r.post('/:projectId/baselines', async (req, res) => {
@@ -403,10 +584,10 @@ r.post('/:projectId/baselines', async (req, res) => {
   if (b.changeRequestId && !(await prisma.changeRequest.findFirst({ where: { id: b.changeRequestId, projectId: access.project.id, status: { in: ['APPROVED', 'IMPLEMENTED'] } } }))) {
     throw badRequest('Re-baselining against a change request requires an approved change request on this project');
   }
-  const items = await prisma.workItem.findMany({ where: { projectId: access.project.id }, select: { id: true, plannedStart: true, plannedFinish: true, estimateHours: true } });
+  const items = await snapshotItems(prisma, access.project.id);
   const bl = await prisma.$transaction(async (tx) => {
-    const x = await tx.baseline.create({ data: { projectId: access.project.id, name: b.name, note: b.note, createdById: req.auth.userId } });
-    await tx.baselineItem.createMany({ data: items.map((i) => ({ baselineId: x.id, workItemId: i.id, plannedStart: i.plannedStart, plannedFinish: i.plannedFinish, estimateHours: i.estimateHours })) });
+    const x = await tx.baseline.create({ data: { projectId: access.project.id, name: b.name, note: b.note, createdById: req.auth.userId, kind: b.changeRequestId ? 'REVISION' : 'SNAPSHOT', changeRequestId: b.changeRequestId ?? null } });
+    await tx.baselineItem.createMany({ data: items.map((i) => ({ baselineId: x.id, ...i })) });
     if (b.changeRequestId) await tx.changeRequest.update({ where: { id: b.changeRequestId }, data: { status: 'IMPLEMENTED' } });
     await audit(tx, req.auth, { action: 'baseline.created', entityType: 'Baseline', entityId: x.id, projectId: access.project.id, metadata: { items: items.length, changeRequestId: b.changeRequestId ?? null } }, req.ip);
     return x;

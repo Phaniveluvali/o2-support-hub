@@ -1,6 +1,5 @@
--- O2 Support Hub - database schema (PostgreSQL 14+)
--- Creates every table, enum, index and foreign key on an EMPTY database, and marks the 3 migrations as applied.
--- psql -U o2app -d o2_support_hub -f schema.sql
+-- O2 Support Hub — PostgreSQL schema (6 migrations, generated 2026-11-19)
+-- Load into an EMPTY database owned by the app login, e.g.:  psql -U o2app -h localhost -d o2_support_hub -v ON_ERROR_STOP=1 -f schema.sql
 
 --
 -- PostgreSQL database dump
@@ -121,7 +120,8 @@ CREATE TYPE public."ProjectRole" AS ENUM (
     'MANAGER',
     'MEMBER',
     'VIEWER',
-    'CUSTOMER'
+    'CUSTOMER',
+    'DIRECTOR'
 );
 
 
@@ -224,6 +224,29 @@ CREATE TYPE public."WorkStatus" AS ENUM (
 );
 
 
+--
+-- Name: o2_protect_original_baseline(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.o2_protect_original_baseline() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE b RECORD;
+BEGIN
+  IF TG_TABLE_NAME = 'Baseline' THEN
+    IF OLD."kind" = 'ORIGINAL' THEN
+      IF TG_OP = 'UPDATE' THEN RAISE EXCEPTION 'The original plan is locked and cannot be changed'; END IF;
+      IF EXISTS (SELECT 1 FROM "Project" p WHERE p."id" = OLD."projectId") THEN RAISE EXCEPTION 'The original plan is locked and cannot be deleted'; END IF;
+    END IF;
+  ELSE
+    SELECT "kind" INTO b FROM "Baseline" WHERE "id" = OLD."baselineId";
+    IF FOUND AND b."kind" = 'ORIGINAL' THEN RAISE EXCEPTION 'The original plan is locked and cannot be changed'; END IF;
+  END IF;
+  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
+  RETURN NEW;
+END $$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -271,7 +294,9 @@ CREATE TABLE public."Baseline" (
     name text NOT NULL,
     note text,
     "createdById" uuid NOT NULL,
-    "createdAt" timestamp(3) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    "createdAt" timestamp(3) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    kind text DEFAULT 'SNAPSHOT'::text NOT NULL,
+    "changeRequestId" uuid
 );
 
 
@@ -285,7 +310,12 @@ CREATE TABLE public."BaselineItem" (
     "workItemId" uuid NOT NULL,
     "plannedStart" date,
     "plannedFinish" date,
-    "estimateHours" numeric(8,2)
+    "estimateHours" numeric(8,2),
+    title text,
+    type text,
+    "assigneeId" uuid,
+    "phaseId" uuid,
+    "parentId" uuid
 );
 
 
@@ -670,7 +700,14 @@ CREATE TABLE public."Project" (
     "workItemSeq" integer DEFAULT 0 NOT NULL,
     version integer DEFAULT 1 NOT NULL,
     "createdAt" timestamp(3) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updatedAt" timestamp(3) with time zone NOT NULL
+    "updatedAt" timestamp(3) with time zone NOT NULL,
+    "planApprovedAt" timestamp(3) with time zone,
+    "planApprovedById" uuid,
+    "directorId" uuid,
+    "planSubmittedAt" timestamp(3) with time zone,
+    "planSubmittedById" uuid,
+    "planReturnedAt" timestamp(3) with time zone,
+    "planReturnNote" text
 );
 
 
@@ -955,7 +992,8 @@ CREATE TABLE public."WorkItem" (
     version integer DEFAULT 1 NOT NULL,
     "createdById" uuid,
     "createdAt" timestamp(3) with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "updatedAt" timestamp(3) with time zone NOT NULL
+    "updatedAt" timestamp(3) with time zone NOT NULL,
+    "startConstraint" date
 );
 
 
@@ -1398,6 +1436,13 @@ CREATE UNIQUE INDEX "BaselineItem_baselineId_workItemId_key" ON public."Baseline
 
 
 --
+-- Name: Baseline_projectId_original_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX "Baseline_projectId_original_key" ON public."Baseline" USING btree ("projectId") WHERE (kind = 'ORIGINAL'::text);
+
+
+--
 -- Name: CannedResponse_organizationId_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1745,6 +1790,20 @@ CREATE INDEX "WorkItem_projectId_phaseId_idx" ON public."WorkItem" USING btree (
 --
 
 CREATE UNIQUE INDEX "WorkingCalendar_organizationId_name_key" ON public."WorkingCalendar" USING btree ("organizationId", name);
+
+
+--
+-- Name: BaselineItem BaselineItem_protect_original; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER "BaselineItem_protect_original" BEFORE DELETE OR UPDATE ON public."BaselineItem" FOR EACH ROW EXECUTE FUNCTION public.o2_protect_original_baseline();
+
+
+--
+-- Name: Baseline Baseline_protect_original; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER "Baseline_protect_original" BEFORE DELETE OR UPDATE ON public."Baseline" FOR EACH ROW EXECUTE FUNCTION public.o2_protect_original_baseline();
 
 
 --
@@ -2249,16 +2308,10 @@ ALTER TABLE ONLY public."WorkingCalendar"
 
 
 
--- Migration history (the app's migrator skips migrations listed here)
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-INSERT INTO public._prisma_migrations VALUES ('b910bd5c-6842-478f-b86d-f55b4b7f42a6', 'a6cb7fbd831a9dd8cdf604b47850d61477cb7c4f41f9e8a997aa286737f555f1', '2026-11-18 10:34:32.983128+00', '20261117000000_init', NULL, NULL, '2026-11-18 10:34:32.983128+00', 1);
-INSERT INTO public._prisma_migrations VALUES ('868ada90-9499-4a73-bc36-1b1a552de903', '1ef3fbe0ad25e81e8e3dd4ff31be2426a2df16cbd5fb93fbb84e037379e7f276', '2026-11-18 10:34:33.11234+00', '20261118000000_support_desk', NULL, NULL, '2026-11-18 10:34:33.11234+00', 1);
-INSERT INTO public._prisma_migrations VALUES ('816cf654-4472-4351-8a2d-913edec014f1', '7258804def3894affb9df192feaac9dd41c26fe3c2797411fff03cc301c97f97', '2026-11-18 10:34:33.126635+00', '20261118100000_user_profile', NULL, NULL, '2026-11-18 10:34:33.126635+00', 1);
+-- Migration history (so the app's migrator sees the schema as up to date)
+INSERT INTO public._prisma_migrations VALUES ('81d40aff-e367-4593-8d7a-66da021de619', 'a6cb7fbd831a9dd8cdf604b47850d61477cb7c4f41f9e8a997aa286737f555f1', '2026-11-19 07:29:40.419139+00', '20261117000000_init', NULL, NULL, '2026-11-19 07:29:40.419139+00', 1);
+INSERT INTO public._prisma_migrations VALUES ('076f41b8-5be8-4426-b84a-2bb2ff9ff160', '1ef3fbe0ad25e81e8e3dd4ff31be2426a2df16cbd5fb93fbb84e037379e7f276', '2026-11-19 07:29:40.574746+00', '20261118000000_support_desk', NULL, NULL, '2026-11-19 07:29:40.574746+00', 1);
+INSERT INTO public._prisma_migrations VALUES ('21929e73-feee-4285-93e1-05a9e2e0657a', '7258804def3894affb9df192feaac9dd41c26fe3c2797411fff03cc301c97f97', '2026-11-19 07:29:40.585807+00', '20261118100000_user_profile', NULL, NULL, '2026-11-19 07:29:40.585807+00', 1);
+INSERT INTO public._prisma_migrations VALUES ('ff1f1440-8028-4d2b-a81d-9c0476c8986e', '9b20e8ddc00595c70dd40b86b4bf0a21135e0c5fbdffc60d79d4651ed8a9dd93', '2026-11-19 07:29:40.58729+00', '20261118200000_original_plan', NULL, NULL, '2026-11-19 07:29:40.58729+00', 1);
+INSERT INTO public._prisma_migrations VALUES ('ecf48199-4b58-423d-9352-1419a55a0522', 'd458a830f5a166e095cde12990ef4257afb132214c584194453174c004117e6f', '2026-11-19 07:29:40.591251+00', '20261119000000_auto_schedule', NULL, NULL, '2026-11-19 07:29:40.591251+00', 1);
+INSERT INTO public._prisma_migrations VALUES ('9a11dcb0-2c3d-40c6-8511-890d8f353403', '5074f2b8dd6fce0477fafc7231680364355a2deb1c716ab4d89463e59215e17e', '2026-11-19 07:29:40.592549+00', '20261120000000_project_director', NULL, NULL, '2026-11-19 07:29:40.592549+00', 1);

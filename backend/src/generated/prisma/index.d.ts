@@ -257,6 +257,7 @@ export type MembershipStatus = (typeof MembershipStatus)[keyof typeof Membership
 
 
 export const ProjectRole: {
+  DIRECTOR: 'DIRECTOR',
   MANAGER: 'MANAGER',
   MEMBER: 'MEMBER',
   VIEWER: 'VIEWER',
@@ -21287,6 +21288,7 @@ export namespace Prisma {
     objectives: string | null
     customerCompanyId: string | null
     managerId: string | null
+    directorId: string | null
     status: $Enums.ProjectStatus | null
     priority: $Enums.Priority | null
     health: $Enums.Health | null
@@ -21302,6 +21304,12 @@ export namespace Prisma {
     templateId: string | null
     workItemSeq: number | null
     version: number | null
+    planApprovedAt: Date | null
+    planApprovedById: string | null
+    planSubmittedAt: Date | null
+    planSubmittedById: string | null
+    planReturnedAt: Date | null
+    planReturnNote: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -21315,6 +21323,7 @@ export namespace Prisma {
     objectives: string | null
     customerCompanyId: string | null
     managerId: string | null
+    directorId: string | null
     status: $Enums.ProjectStatus | null
     priority: $Enums.Priority | null
     health: $Enums.Health | null
@@ -21330,6 +21339,12 @@ export namespace Prisma {
     templateId: string | null
     workItemSeq: number | null
     version: number | null
+    planApprovedAt: Date | null
+    planApprovedById: string | null
+    planSubmittedAt: Date | null
+    planSubmittedById: string | null
+    planReturnedAt: Date | null
+    planReturnNote: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -21343,6 +21358,7 @@ export namespace Prisma {
     objectives: number
     customerCompanyId: number
     managerId: number
+    directorId: number
     status: number
     priority: number
     health: number
@@ -21358,6 +21374,12 @@ export namespace Prisma {
     templateId: number
     workItemSeq: number
     version: number
+    planApprovedAt: number
+    planApprovedById: number
+    planSubmittedAt: number
+    planSubmittedById: number
+    planReturnedAt: number
+    planReturnNote: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -21387,6 +21409,7 @@ export namespace Prisma {
     objectives?: true
     customerCompanyId?: true
     managerId?: true
+    directorId?: true
     status?: true
     priority?: true
     health?: true
@@ -21402,6 +21425,12 @@ export namespace Prisma {
     templateId?: true
     workItemSeq?: true
     version?: true
+    planApprovedAt?: true
+    planApprovedById?: true
+    planSubmittedAt?: true
+    planSubmittedById?: true
+    planReturnedAt?: true
+    planReturnNote?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -21415,6 +21444,7 @@ export namespace Prisma {
     objectives?: true
     customerCompanyId?: true
     managerId?: true
+    directorId?: true
     status?: true
     priority?: true
     health?: true
@@ -21430,6 +21460,12 @@ export namespace Prisma {
     templateId?: true
     workItemSeq?: true
     version?: true
+    planApprovedAt?: true
+    planApprovedById?: true
+    planSubmittedAt?: true
+    planSubmittedById?: true
+    planReturnedAt?: true
+    planReturnNote?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -21443,6 +21479,7 @@ export namespace Prisma {
     objectives?: true
     customerCompanyId?: true
     managerId?: true
+    directorId?: true
     status?: true
     priority?: true
     health?: true
@@ -21458,6 +21495,12 @@ export namespace Prisma {
     templateId?: true
     workItemSeq?: true
     version?: true
+    planApprovedAt?: true
+    planApprovedById?: true
+    planSubmittedAt?: true
+    planSubmittedById?: true
+    planReturnedAt?: true
+    planReturnNote?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -21558,6 +21601,7 @@ export namespace Prisma {
     objectives: string | null
     customerCompanyId: string | null
     managerId: string | null
+    directorId: string | null
     status: $Enums.ProjectStatus
     priority: $Enums.Priority
     health: $Enums.Health
@@ -21573,6 +21617,12 @@ export namespace Prisma {
     templateId: string | null
     workItemSeq: number
     version: number
+    planApprovedAt: Date | null
+    planApprovedById: string | null
+    planSubmittedAt: Date | null
+    planSubmittedById: string | null
+    planReturnedAt: Date | null
+    planReturnNote: string | null
     createdAt: Date
     updatedAt: Date
     _count: ProjectCountAggregateOutputType | null
@@ -21605,6 +21655,7 @@ export namespace Prisma {
     objectives?: boolean
     customerCompanyId?: boolean
     managerId?: boolean
+    directorId?: boolean
     status?: boolean
     priority?: boolean
     health?: boolean
@@ -21620,6 +21671,12 @@ export namespace Prisma {
     templateId?: boolean
     workItemSeq?: boolean
     version?: boolean
+    planApprovedAt?: boolean
+    planApprovedById?: boolean
+    planSubmittedAt?: boolean
+    planSubmittedById?: boolean
+    planReturnedAt?: boolean
+    planReturnNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
@@ -21652,6 +21709,7 @@ export namespace Prisma {
     objectives?: boolean
     customerCompanyId?: boolean
     managerId?: boolean
+    directorId?: boolean
     status?: boolean
     priority?: boolean
     health?: boolean
@@ -21667,6 +21725,12 @@ export namespace Prisma {
     templateId?: boolean
     workItemSeq?: boolean
     version?: boolean
+    planApprovedAt?: boolean
+    planApprovedById?: boolean
+    planSubmittedAt?: boolean
+    planSubmittedById?: boolean
+    planReturnedAt?: boolean
+    planReturnNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
@@ -21684,6 +21748,7 @@ export namespace Prisma {
     objectives?: boolean
     customerCompanyId?: boolean
     managerId?: boolean
+    directorId?: boolean
     status?: boolean
     priority?: boolean
     health?: boolean
@@ -21699,6 +21764,12 @@ export namespace Prisma {
     templateId?: boolean
     workItemSeq?: boolean
     version?: boolean
+    planApprovedAt?: boolean
+    planApprovedById?: boolean
+    planSubmittedAt?: boolean
+    planSubmittedById?: boolean
+    planReturnedAt?: boolean
+    planReturnNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
@@ -21716,6 +21787,7 @@ export namespace Prisma {
     objectives?: boolean
     customerCompanyId?: boolean
     managerId?: boolean
+    directorId?: boolean
     status?: boolean
     priority?: boolean
     health?: boolean
@@ -21731,11 +21803,17 @@ export namespace Prisma {
     templateId?: boolean
     workItemSeq?: boolean
     version?: boolean
+    planApprovedAt?: boolean
+    planApprovedById?: boolean
+    planSubmittedAt?: boolean
+    planSubmittedById?: boolean
+    planReturnedAt?: boolean
+    planReturnNote?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "code" | "name" | "description" | "objectives" | "customerCompanyId" | "managerId" | "status" | "priority" | "health" | "plannedStart" | "plannedFinish" | "calendarId" | "timezone" | "budgetAmount" | "budgetCurrency" | "billingEnabled" | "hourlyRate" | "customerVisible" | "templateId" | "workItemSeq" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "code" | "name" | "description" | "objectives" | "customerCompanyId" | "managerId" | "directorId" | "status" | "priority" | "health" | "plannedStart" | "plannedFinish" | "calendarId" | "timezone" | "budgetAmount" | "budgetCurrency" | "billingEnabled" | "hourlyRate" | "customerVisible" | "templateId" | "workItemSeq" | "version" | "planApprovedAt" | "planApprovedById" | "planSubmittedAt" | "planSubmittedById" | "planReturnedAt" | "planReturnNote" | "createdAt" | "updatedAt", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     customerCompany?: boolean | Project$customerCompanyArgs<ExtArgs>
@@ -21801,6 +21879,7 @@ export namespace Prisma {
       objectives: string | null
       customerCompanyId: string | null
       managerId: string | null
+      directorId: string | null
       status: $Enums.ProjectStatus
       priority: $Enums.Priority
       health: $Enums.Health
@@ -21816,6 +21895,12 @@ export namespace Prisma {
       templateId: string | null
       workItemSeq: number
       version: number
+      planApprovedAt: Date | null
+      planApprovedById: string | null
+      planSubmittedAt: Date | null
+      planSubmittedById: string | null
+      planReturnedAt: Date | null
+      planReturnNote: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["project"]>
@@ -22267,6 +22352,7 @@ export namespace Prisma {
     readonly objectives: FieldRef<"Project", 'String'>
     readonly customerCompanyId: FieldRef<"Project", 'String'>
     readonly managerId: FieldRef<"Project", 'String'>
+    readonly directorId: FieldRef<"Project", 'String'>
     readonly status: FieldRef<"Project", 'ProjectStatus'>
     readonly priority: FieldRef<"Project", 'Priority'>
     readonly health: FieldRef<"Project", 'Health'>
@@ -22282,6 +22368,12 @@ export namespace Prisma {
     readonly templateId: FieldRef<"Project", 'String'>
     readonly workItemSeq: FieldRef<"Project", 'Int'>
     readonly version: FieldRef<"Project", 'Int'>
+    readonly planApprovedAt: FieldRef<"Project", 'DateTime'>
+    readonly planApprovedById: FieldRef<"Project", 'String'>
+    readonly planSubmittedAt: FieldRef<"Project", 'DateTime'>
+    readonly planSubmittedById: FieldRef<"Project", 'String'>
+    readonly planReturnedAt: FieldRef<"Project", 'DateTime'>
+    readonly planReturnNote: FieldRef<"Project", 'String'>
     readonly createdAt: FieldRef<"Project", 'DateTime'>
     readonly updatedAt: FieldRef<"Project", 'DateTime'>
   }
@@ -25483,6 +25575,7 @@ export namespace Prisma {
     plannedFinish: Date | null
     actualStart: Date | null
     actualFinish: Date | null
+    startConstraint: Date | null
     estimateHours: Decimal | null
     percentComplete: number | null
     customerVisible: boolean | null
@@ -25510,6 +25603,7 @@ export namespace Prisma {
     plannedFinish: Date | null
     actualStart: Date | null
     actualFinish: Date | null
+    startConstraint: Date | null
     estimateHours: Decimal | null
     percentComplete: number | null
     customerVisible: boolean | null
@@ -25537,6 +25631,7 @@ export namespace Prisma {
     plannedFinish: number
     actualStart: number
     actualFinish: number
+    startConstraint: number
     estimateHours: number
     percentComplete: number
     customerVisible: number
@@ -25583,6 +25678,7 @@ export namespace Prisma {
     plannedFinish?: true
     actualStart?: true
     actualFinish?: true
+    startConstraint?: true
     estimateHours?: true
     percentComplete?: true
     customerVisible?: true
@@ -25610,6 +25706,7 @@ export namespace Prisma {
     plannedFinish?: true
     actualStart?: true
     actualFinish?: true
+    startConstraint?: true
     estimateHours?: true
     percentComplete?: true
     customerVisible?: true
@@ -25637,6 +25734,7 @@ export namespace Prisma {
     plannedFinish?: true
     actualStart?: true
     actualFinish?: true
+    startConstraint?: true
     estimateHours?: true
     percentComplete?: true
     customerVisible?: true
@@ -25752,6 +25850,7 @@ export namespace Prisma {
     plannedFinish: Date | null
     actualStart: Date | null
     actualFinish: Date | null
+    startConstraint: Date | null
     estimateHours: Decimal | null
     percentComplete: number
     customerVisible: boolean
@@ -25799,6 +25898,7 @@ export namespace Prisma {
     plannedFinish?: boolean
     actualStart?: boolean
     actualFinish?: boolean
+    startConstraint?: boolean
     estimateHours?: boolean
     percentComplete?: boolean
     customerVisible?: boolean
@@ -25838,6 +25938,7 @@ export namespace Prisma {
     plannedFinish?: boolean
     actualStart?: boolean
     actualFinish?: boolean
+    startConstraint?: boolean
     estimateHours?: boolean
     percentComplete?: boolean
     customerVisible?: boolean
@@ -25869,6 +25970,7 @@ export namespace Prisma {
     plannedFinish?: boolean
     actualStart?: boolean
     actualFinish?: boolean
+    startConstraint?: boolean
     estimateHours?: boolean
     percentComplete?: boolean
     customerVisible?: boolean
@@ -25900,6 +26002,7 @@ export namespace Prisma {
     plannedFinish?: boolean
     actualStart?: boolean
     actualFinish?: boolean
+    startConstraint?: boolean
     estimateHours?: boolean
     percentComplete?: boolean
     customerVisible?: boolean
@@ -25911,7 +26014,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type WorkItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "phaseId" | "parentId" | "type" | "number" | "title" | "description" | "acceptanceCriteria" | "assigneeId" | "status" | "priority" | "plannedStart" | "plannedFinish" | "actualStart" | "actualFinish" | "estimateHours" | "percentComplete" | "customerVisible" | "labels" | "sortOrder" | "version" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["workItem"]>
+  export type WorkItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "phaseId" | "parentId" | "type" | "number" | "title" | "description" | "acceptanceCriteria" | "assigneeId" | "status" | "priority" | "plannedStart" | "plannedFinish" | "actualStart" | "actualFinish" | "startConstraint" | "estimateHours" | "percentComplete" | "customerVisible" | "labels" | "sortOrder" | "version" | "createdById" | "createdAt" | "updatedAt", ExtArgs["result"]["workItem"]>
   export type WorkItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     phase?: boolean | WorkItem$phaseArgs<ExtArgs>
@@ -25967,6 +26070,11 @@ export namespace Prisma {
       plannedFinish: Date | null
       actualStart: Date | null
       actualFinish: Date | null
+      /**
+       * "Start no earlier than": set when the manager fixes a start date. Null = start as soon as the
+       * tasks it waits for are finished (or at the project start when it waits for nothing).
+       */
+      startConstraint: Date | null
       estimateHours: Prisma.Decimal | null
       percentComplete: number
       customerVisible: boolean
@@ -26425,6 +26533,7 @@ export namespace Prisma {
     readonly plannedFinish: FieldRef<"WorkItem", 'DateTime'>
     readonly actualStart: FieldRef<"WorkItem", 'DateTime'>
     readonly actualFinish: FieldRef<"WorkItem", 'DateTime'>
+    readonly startConstraint: FieldRef<"WorkItem", 'DateTime'>
     readonly estimateHours: FieldRef<"WorkItem", 'Decimal'>
     readonly percentComplete: FieldRef<"WorkItem", 'Int'>
     readonly customerVisible: FieldRef<"WorkItem", 'Boolean'>
@@ -30334,6 +30443,8 @@ export namespace Prisma {
     projectId: string | null
     name: string | null
     note: string | null
+    kind: string | null
+    changeRequestId: string | null
     createdById: string | null
     createdAt: Date | null
   }
@@ -30343,6 +30454,8 @@ export namespace Prisma {
     projectId: string | null
     name: string | null
     note: string | null
+    kind: string | null
+    changeRequestId: string | null
     createdById: string | null
     createdAt: Date | null
   }
@@ -30352,6 +30465,8 @@ export namespace Prisma {
     projectId: number
     name: number
     note: number
+    kind: number
+    changeRequestId: number
     createdById: number
     createdAt: number
     _all: number
@@ -30363,6 +30478,8 @@ export namespace Prisma {
     projectId?: true
     name?: true
     note?: true
+    kind?: true
+    changeRequestId?: true
     createdById?: true
     createdAt?: true
   }
@@ -30372,6 +30489,8 @@ export namespace Prisma {
     projectId?: true
     name?: true
     note?: true
+    kind?: true
+    changeRequestId?: true
     createdById?: true
     createdAt?: true
   }
@@ -30381,6 +30500,8 @@ export namespace Prisma {
     projectId?: true
     name?: true
     note?: true
+    kind?: true
+    changeRequestId?: true
     createdById?: true
     createdAt?: true
     _all?: true
@@ -30463,6 +30584,8 @@ export namespace Prisma {
     projectId: string
     name: string
     note: string | null
+    kind: string
+    changeRequestId: string | null
     createdById: string
     createdAt: Date
     _count: BaselineCountAggregateOutputType | null
@@ -30489,6 +30612,8 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     note?: boolean
+    kind?: boolean
+    changeRequestId?: boolean
     createdById?: boolean
     createdAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -30501,6 +30626,8 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     note?: boolean
+    kind?: boolean
+    changeRequestId?: boolean
     createdById?: boolean
     createdAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -30511,6 +30638,8 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     note?: boolean
+    kind?: boolean
+    changeRequestId?: boolean
     createdById?: boolean
     createdAt?: boolean
     project?: boolean | ProjectDefaultArgs<ExtArgs>
@@ -30521,11 +30650,13 @@ export namespace Prisma {
     projectId?: boolean
     name?: boolean
     note?: boolean
+    kind?: boolean
+    changeRequestId?: boolean
     createdById?: boolean
     createdAt?: boolean
   }
 
-  export type BaselineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "note" | "createdById" | "createdAt", ExtArgs["result"]["baseline"]>
+  export type BaselineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "name" | "note" | "kind" | "changeRequestId" | "createdById" | "createdAt", ExtArgs["result"]["baseline"]>
   export type BaselineInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     items?: boolean | Baseline$itemsArgs<ExtArgs>
@@ -30549,6 +30680,11 @@ export namespace Prisma {
       projectId: string
       name: string
       note: string | null
+      /**
+       * ORIGINAL = the approved plan (one per project, locked by a database trigger); REVISION = re-plan after an approved change request; SNAPSHOT = informal save
+       */
+      kind: string
+      changeRequestId: string | null
       createdById: string
       createdAt: Date
     }, ExtArgs["result"]["baseline"]>
@@ -30980,6 +31116,8 @@ export namespace Prisma {
     readonly projectId: FieldRef<"Baseline", 'String'>
     readonly name: FieldRef<"Baseline", 'String'>
     readonly note: FieldRef<"Baseline", 'String'>
+    readonly kind: FieldRef<"Baseline", 'String'>
+    readonly changeRequestId: FieldRef<"Baseline", 'String'>
     readonly createdById: FieldRef<"Baseline", 'String'>
     readonly createdAt: FieldRef<"Baseline", 'DateTime'>
   }
@@ -31452,6 +31590,11 @@ export namespace Prisma {
     plannedStart: Date | null
     plannedFinish: Date | null
     estimateHours: Decimal | null
+    title: string | null
+    type: string | null
+    assigneeId: string | null
+    phaseId: string | null
+    parentId: string | null
   }
 
   export type BaselineItemMaxAggregateOutputType = {
@@ -31461,6 +31604,11 @@ export namespace Prisma {
     plannedStart: Date | null
     plannedFinish: Date | null
     estimateHours: Decimal | null
+    title: string | null
+    type: string | null
+    assigneeId: string | null
+    phaseId: string | null
+    parentId: string | null
   }
 
   export type BaselineItemCountAggregateOutputType = {
@@ -31470,6 +31618,11 @@ export namespace Prisma {
     plannedStart: number
     plannedFinish: number
     estimateHours: number
+    title: number
+    type: number
+    assigneeId: number
+    phaseId: number
+    parentId: number
     _all: number
   }
 
@@ -31489,6 +31642,11 @@ export namespace Prisma {
     plannedStart?: true
     plannedFinish?: true
     estimateHours?: true
+    title?: true
+    type?: true
+    assigneeId?: true
+    phaseId?: true
+    parentId?: true
   }
 
   export type BaselineItemMaxAggregateInputType = {
@@ -31498,6 +31656,11 @@ export namespace Prisma {
     plannedStart?: true
     plannedFinish?: true
     estimateHours?: true
+    title?: true
+    type?: true
+    assigneeId?: true
+    phaseId?: true
+    parentId?: true
   }
 
   export type BaselineItemCountAggregateInputType = {
@@ -31507,6 +31670,11 @@ export namespace Prisma {
     plannedStart?: true
     plannedFinish?: true
     estimateHours?: true
+    title?: true
+    type?: true
+    assigneeId?: true
+    phaseId?: true
+    parentId?: true
     _all?: true
   }
 
@@ -31603,6 +31771,11 @@ export namespace Prisma {
     plannedStart: Date | null
     plannedFinish: Date | null
     estimateHours: Decimal | null
+    title: string | null
+    type: string | null
+    assigneeId: string | null
+    phaseId: string | null
+    parentId: string | null
     _count: BaselineItemCountAggregateOutputType | null
     _avg: BaselineItemAvgAggregateOutputType | null
     _sum: BaselineItemSumAggregateOutputType | null
@@ -31631,6 +31804,11 @@ export namespace Prisma {
     plannedStart?: boolean
     plannedFinish?: boolean
     estimateHours?: boolean
+    title?: boolean
+    type?: boolean
+    assigneeId?: boolean
+    phaseId?: boolean
+    parentId?: boolean
     baseline?: boolean | BaselineDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["baselineItem"]>
 
@@ -31641,6 +31819,11 @@ export namespace Prisma {
     plannedStart?: boolean
     plannedFinish?: boolean
     estimateHours?: boolean
+    title?: boolean
+    type?: boolean
+    assigneeId?: boolean
+    phaseId?: boolean
+    parentId?: boolean
     baseline?: boolean | BaselineDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["baselineItem"]>
 
@@ -31651,6 +31834,11 @@ export namespace Prisma {
     plannedStart?: boolean
     plannedFinish?: boolean
     estimateHours?: boolean
+    title?: boolean
+    type?: boolean
+    assigneeId?: boolean
+    phaseId?: boolean
+    parentId?: boolean
     baseline?: boolean | BaselineDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["baselineItem"]>
 
@@ -31661,9 +31849,14 @@ export namespace Prisma {
     plannedStart?: boolean
     plannedFinish?: boolean
     estimateHours?: boolean
+    title?: boolean
+    type?: boolean
+    assigneeId?: boolean
+    phaseId?: boolean
+    parentId?: boolean
   }
 
-  export type BaselineItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "baselineId" | "workItemId" | "plannedStart" | "plannedFinish" | "estimateHours", ExtArgs["result"]["baselineItem"]>
+  export type BaselineItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "baselineId" | "workItemId" | "plannedStart" | "plannedFinish" | "estimateHours" | "title" | "type" | "assigneeId" | "phaseId" | "parentId", ExtArgs["result"]["baselineItem"]>
   export type BaselineItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     baseline?: boolean | BaselineDefaultArgs<ExtArgs>
   }
@@ -31686,6 +31879,11 @@ export namespace Prisma {
       plannedStart: Date | null
       plannedFinish: Date | null
       estimateHours: Prisma.Decimal | null
+      title: string | null
+      type: string | null
+      assigneeId: string | null
+      phaseId: string | null
+      parentId: string | null
     }, ExtArgs["result"]["baselineItem"]>
     composites: {}
   }
@@ -32116,6 +32314,11 @@ export namespace Prisma {
     readonly plannedStart: FieldRef<"BaselineItem", 'DateTime'>
     readonly plannedFinish: FieldRef<"BaselineItem", 'DateTime'>
     readonly estimateHours: FieldRef<"BaselineItem", 'Decimal'>
+    readonly title: FieldRef<"BaselineItem", 'String'>
+    readonly type: FieldRef<"BaselineItem", 'String'>
+    readonly assigneeId: FieldRef<"BaselineItem", 'String'>
+    readonly phaseId: FieldRef<"BaselineItem", 'String'>
+    readonly parentId: FieldRef<"BaselineItem", 'String'>
   }
     
 
@@ -58183,6 +58386,7 @@ export namespace Prisma {
     objectives: 'objectives',
     customerCompanyId: 'customerCompanyId',
     managerId: 'managerId',
+    directorId: 'directorId',
     status: 'status',
     priority: 'priority',
     health: 'health',
@@ -58198,6 +58402,12 @@ export namespace Prisma {
     templateId: 'templateId',
     workItemSeq: 'workItemSeq',
     version: 'version',
+    planApprovedAt: 'planApprovedAt',
+    planApprovedById: 'planApprovedById',
+    planSubmittedAt: 'planSubmittedAt',
+    planSubmittedById: 'planSubmittedById',
+    planReturnedAt: 'planReturnedAt',
+    planReturnNote: 'planReturnNote',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -58250,6 +58460,7 @@ export namespace Prisma {
     plannedFinish: 'plannedFinish',
     actualStart: 'actualStart',
     actualFinish: 'actualFinish',
+    startConstraint: 'startConstraint',
     estimateHours: 'estimateHours',
     percentComplete: 'percentComplete',
     customerVisible: 'customerVisible',
@@ -58301,6 +58512,8 @@ export namespace Prisma {
     projectId: 'projectId',
     name: 'name',
     note: 'note',
+    kind: 'kind',
+    changeRequestId: 'changeRequestId',
     createdById: 'createdById',
     createdAt: 'createdAt'
   };
@@ -58314,7 +58527,12 @@ export namespace Prisma {
     workItemId: 'workItemId',
     plannedStart: 'plannedStart',
     plannedFinish: 'plannedFinish',
-    estimateHours: 'estimateHours'
+    estimateHours: 'estimateHours',
+    title: 'title',
+    type: 'type',
+    assigneeId: 'assigneeId',
+    phaseId: 'phaseId',
+    parentId: 'parentId'
   };
 
   export type BaselineItemScalarFieldEnum = (typeof BaselineItemScalarFieldEnum)[keyof typeof BaselineItemScalarFieldEnum]
@@ -60075,6 +60293,7 @@ export namespace Prisma {
     objectives?: StringNullableFilter<"Project"> | string | null
     customerCompanyId?: UuidNullableFilter<"Project"> | string | null
     managerId?: UuidNullableFilter<"Project"> | string | null
+    directorId?: UuidNullableFilter<"Project"> | string | null
     status?: EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
     priority?: EnumPriorityFilter<"Project"> | $Enums.Priority
     health?: EnumHealthFilter<"Project"> | $Enums.Health
@@ -60090,6 +60309,12 @@ export namespace Prisma {
     templateId?: UuidNullableFilter<"Project"> | string | null
     workItemSeq?: IntFilter<"Project"> | number
     version?: IntFilter<"Project"> | number
+    planApprovedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planApprovedById?: UuidNullableFilter<"Project"> | string | null
+    planSubmittedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planSubmittedById?: UuidNullableFilter<"Project"> | string | null
+    planReturnedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planReturnNote?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
@@ -60121,6 +60346,7 @@ export namespace Prisma {
     objectives?: SortOrderInput | SortOrder
     customerCompanyId?: SortOrderInput | SortOrder
     managerId?: SortOrderInput | SortOrder
+    directorId?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     health?: SortOrder
@@ -60136,6 +60362,12 @@ export namespace Prisma {
     templateId?: SortOrderInput | SortOrder
     workItemSeq?: SortOrder
     version?: SortOrder
+    planApprovedAt?: SortOrderInput | SortOrder
+    planApprovedById?: SortOrderInput | SortOrder
+    planSubmittedAt?: SortOrderInput | SortOrder
+    planSubmittedById?: SortOrderInput | SortOrder
+    planReturnedAt?: SortOrderInput | SortOrder
+    planReturnNote?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     organization?: OrganizationOrderByWithRelationInput
@@ -60171,6 +60403,7 @@ export namespace Prisma {
     objectives?: StringNullableFilter<"Project"> | string | null
     customerCompanyId?: UuidNullableFilter<"Project"> | string | null
     managerId?: UuidNullableFilter<"Project"> | string | null
+    directorId?: UuidNullableFilter<"Project"> | string | null
     status?: EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
     priority?: EnumPriorityFilter<"Project"> | $Enums.Priority
     health?: EnumHealthFilter<"Project"> | $Enums.Health
@@ -60186,6 +60419,12 @@ export namespace Prisma {
     templateId?: UuidNullableFilter<"Project"> | string | null
     workItemSeq?: IntFilter<"Project"> | number
     version?: IntFilter<"Project"> | number
+    planApprovedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planApprovedById?: UuidNullableFilter<"Project"> | string | null
+    planSubmittedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planSubmittedById?: UuidNullableFilter<"Project"> | string | null
+    planReturnedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planReturnNote?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
@@ -60217,6 +60456,7 @@ export namespace Prisma {
     objectives?: SortOrderInput | SortOrder
     customerCompanyId?: SortOrderInput | SortOrder
     managerId?: SortOrderInput | SortOrder
+    directorId?: SortOrderInput | SortOrder
     status?: SortOrder
     priority?: SortOrder
     health?: SortOrder
@@ -60232,6 +60472,12 @@ export namespace Prisma {
     templateId?: SortOrderInput | SortOrder
     workItemSeq?: SortOrder
     version?: SortOrder
+    planApprovedAt?: SortOrderInput | SortOrder
+    planApprovedById?: SortOrderInput | SortOrder
+    planSubmittedAt?: SortOrderInput | SortOrder
+    planSubmittedById?: SortOrderInput | SortOrder
+    planReturnedAt?: SortOrderInput | SortOrder
+    planReturnNote?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ProjectCountOrderByAggregateInput
@@ -60253,6 +60499,7 @@ export namespace Prisma {
     objectives?: StringNullableWithAggregatesFilter<"Project"> | string | null
     customerCompanyId?: UuidNullableWithAggregatesFilter<"Project"> | string | null
     managerId?: UuidNullableWithAggregatesFilter<"Project"> | string | null
+    directorId?: UuidNullableWithAggregatesFilter<"Project"> | string | null
     status?: EnumProjectStatusWithAggregatesFilter<"Project"> | $Enums.ProjectStatus
     priority?: EnumPriorityWithAggregatesFilter<"Project"> | $Enums.Priority
     health?: EnumHealthWithAggregatesFilter<"Project"> | $Enums.Health
@@ -60268,6 +60515,12 @@ export namespace Prisma {
     templateId?: UuidNullableWithAggregatesFilter<"Project"> | string | null
     workItemSeq?: IntWithAggregatesFilter<"Project"> | number
     version?: IntWithAggregatesFilter<"Project"> | number
+    planApprovedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    planApprovedById?: UuidNullableWithAggregatesFilter<"Project"> | string | null
+    planSubmittedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    planSubmittedById?: UuidNullableWithAggregatesFilter<"Project"> | string | null
+    planReturnedAt?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
+    planReturnNote?: StringNullableWithAggregatesFilter<"Project"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Project"> | Date | string
   }
@@ -60446,6 +60699,7 @@ export namespace Prisma {
     plannedFinish?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     actualStart?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     actualFinish?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
+    startConstraint?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     estimateHours?: DecimalNullableFilter<"WorkItem"> | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFilter<"WorkItem"> | number
     customerVisible?: BoolFilter<"WorkItem"> | boolean
@@ -60484,6 +60738,7 @@ export namespace Prisma {
     plannedFinish?: SortOrderInput | SortOrder
     actualStart?: SortOrderInput | SortOrder
     actualFinish?: SortOrderInput | SortOrder
+    startConstraint?: SortOrderInput | SortOrder
     estimateHours?: SortOrderInput | SortOrder
     percentComplete?: SortOrder
     customerVisible?: SortOrder
@@ -60526,6 +60781,7 @@ export namespace Prisma {
     plannedFinish?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     actualStart?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     actualFinish?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
+    startConstraint?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     estimateHours?: DecimalNullableFilter<"WorkItem"> | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFilter<"WorkItem"> | number
     customerVisible?: BoolFilter<"WorkItem"> | boolean
@@ -60564,6 +60820,7 @@ export namespace Prisma {
     plannedFinish?: SortOrderInput | SortOrder
     actualStart?: SortOrderInput | SortOrder
     actualFinish?: SortOrderInput | SortOrder
+    startConstraint?: SortOrderInput | SortOrder
     estimateHours?: SortOrderInput | SortOrder
     percentComplete?: SortOrder
     customerVisible?: SortOrder
@@ -60600,6 +60857,7 @@ export namespace Prisma {
     plannedFinish?: DateTimeNullableWithAggregatesFilter<"WorkItem"> | Date | string | null
     actualStart?: DateTimeNullableWithAggregatesFilter<"WorkItem"> | Date | string | null
     actualFinish?: DateTimeNullableWithAggregatesFilter<"WorkItem"> | Date | string | null
+    startConstraint?: DateTimeNullableWithAggregatesFilter<"WorkItem"> | Date | string | null
     estimateHours?: DecimalNullableWithAggregatesFilter<"WorkItem"> | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntWithAggregatesFilter<"WorkItem"> | number
     customerVisible?: BoolWithAggregatesFilter<"WorkItem"> | boolean
@@ -60791,6 +61049,8 @@ export namespace Prisma {
     projectId?: UuidFilter<"Baseline"> | string
     name?: StringFilter<"Baseline"> | string
     note?: StringNullableFilter<"Baseline"> | string | null
+    kind?: StringFilter<"Baseline"> | string
+    changeRequestId?: UuidNullableFilter<"Baseline"> | string | null
     createdById?: UuidFilter<"Baseline"> | string
     createdAt?: DateTimeFilter<"Baseline"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
@@ -60802,6 +61062,8 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     note?: SortOrderInput | SortOrder
+    kind?: SortOrder
+    changeRequestId?: SortOrderInput | SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
     project?: ProjectOrderByWithRelationInput
@@ -60816,6 +61078,8 @@ export namespace Prisma {
     projectId?: UuidFilter<"Baseline"> | string
     name?: StringFilter<"Baseline"> | string
     note?: StringNullableFilter<"Baseline"> | string | null
+    kind?: StringFilter<"Baseline"> | string
+    changeRequestId?: UuidNullableFilter<"Baseline"> | string | null
     createdById?: UuidFilter<"Baseline"> | string
     createdAt?: DateTimeFilter<"Baseline"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
@@ -60827,6 +61091,8 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     note?: SortOrderInput | SortOrder
+    kind?: SortOrder
+    changeRequestId?: SortOrderInput | SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
     _count?: BaselineCountOrderByAggregateInput
@@ -60842,6 +61108,8 @@ export namespace Prisma {
     projectId?: UuidWithAggregatesFilter<"Baseline"> | string
     name?: StringWithAggregatesFilter<"Baseline"> | string
     note?: StringNullableWithAggregatesFilter<"Baseline"> | string | null
+    kind?: StringWithAggregatesFilter<"Baseline"> | string
+    changeRequestId?: UuidNullableWithAggregatesFilter<"Baseline"> | string | null
     createdById?: UuidWithAggregatesFilter<"Baseline"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Baseline"> | Date | string
   }
@@ -60856,6 +61124,11 @@ export namespace Prisma {
     plannedStart?: DateTimeNullableFilter<"BaselineItem"> | Date | string | null
     plannedFinish?: DateTimeNullableFilter<"BaselineItem"> | Date | string | null
     estimateHours?: DecimalNullableFilter<"BaselineItem"> | Decimal | DecimalJsLike | number | string | null
+    title?: StringNullableFilter<"BaselineItem"> | string | null
+    type?: StringNullableFilter<"BaselineItem"> | string | null
+    assigneeId?: UuidNullableFilter<"BaselineItem"> | string | null
+    phaseId?: UuidNullableFilter<"BaselineItem"> | string | null
+    parentId?: UuidNullableFilter<"BaselineItem"> | string | null
     baseline?: XOR<BaselineScalarRelationFilter, BaselineWhereInput>
   }
 
@@ -60866,6 +61139,11 @@ export namespace Prisma {
     plannedStart?: SortOrderInput | SortOrder
     plannedFinish?: SortOrderInput | SortOrder
     estimateHours?: SortOrderInput | SortOrder
+    title?: SortOrderInput | SortOrder
+    type?: SortOrderInput | SortOrder
+    assigneeId?: SortOrderInput | SortOrder
+    phaseId?: SortOrderInput | SortOrder
+    parentId?: SortOrderInput | SortOrder
     baseline?: BaselineOrderByWithRelationInput
   }
 
@@ -60880,6 +61158,11 @@ export namespace Prisma {
     plannedStart?: DateTimeNullableFilter<"BaselineItem"> | Date | string | null
     plannedFinish?: DateTimeNullableFilter<"BaselineItem"> | Date | string | null
     estimateHours?: DecimalNullableFilter<"BaselineItem"> | Decimal | DecimalJsLike | number | string | null
+    title?: StringNullableFilter<"BaselineItem"> | string | null
+    type?: StringNullableFilter<"BaselineItem"> | string | null
+    assigneeId?: UuidNullableFilter<"BaselineItem"> | string | null
+    phaseId?: UuidNullableFilter<"BaselineItem"> | string | null
+    parentId?: UuidNullableFilter<"BaselineItem"> | string | null
     baseline?: XOR<BaselineScalarRelationFilter, BaselineWhereInput>
   }, "id" | "baselineId_workItemId">
 
@@ -60890,6 +61173,11 @@ export namespace Prisma {
     plannedStart?: SortOrderInput | SortOrder
     plannedFinish?: SortOrderInput | SortOrder
     estimateHours?: SortOrderInput | SortOrder
+    title?: SortOrderInput | SortOrder
+    type?: SortOrderInput | SortOrder
+    assigneeId?: SortOrderInput | SortOrder
+    phaseId?: SortOrderInput | SortOrder
+    parentId?: SortOrderInput | SortOrder
     _count?: BaselineItemCountOrderByAggregateInput
     _avg?: BaselineItemAvgOrderByAggregateInput
     _max?: BaselineItemMaxOrderByAggregateInput
@@ -60907,6 +61195,11 @@ export namespace Prisma {
     plannedStart?: DateTimeNullableWithAggregatesFilter<"BaselineItem"> | Date | string | null
     plannedFinish?: DateTimeNullableWithAggregatesFilter<"BaselineItem"> | Date | string | null
     estimateHours?: DecimalNullableWithAggregatesFilter<"BaselineItem"> | Decimal | DecimalJsLike | number | string | null
+    title?: StringNullableWithAggregatesFilter<"BaselineItem"> | string | null
+    type?: StringNullableWithAggregatesFilter<"BaselineItem"> | string | null
+    assigneeId?: UuidNullableWithAggregatesFilter<"BaselineItem"> | string | null
+    phaseId?: UuidNullableWithAggregatesFilter<"BaselineItem"> | string | null
+    parentId?: UuidNullableWithAggregatesFilter<"BaselineItem"> | string | null
   }
 
   export type DiscussionWhereInput = {
@@ -63806,6 +64099,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -63819,6 +64113,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -63850,6 +64150,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -63865,6 +64166,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -63890,6 +64197,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -63903,6 +64211,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -63934,6 +64248,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -63949,6 +64264,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -63976,6 +64297,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -63991,6 +64313,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -64002,6 +64330,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -64015,6 +64344,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -64028,6 +64363,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -64043,6 +64379,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -64220,6 +64562,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -64258,6 +64601,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -64290,6 +64634,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -64328,6 +64673,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -64363,6 +64709,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -64388,6 +64735,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -64416,6 +64764,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -64587,6 +64936,8 @@ export namespace Prisma {
     id?: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
     project: ProjectCreateNestedOneWithoutBaselinesInput
@@ -64598,6 +64949,8 @@ export namespace Prisma {
     projectId: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
     items?: BaselineItemUncheckedCreateNestedManyWithoutBaselineInput
@@ -64607,6 +64960,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutBaselinesNestedInput
@@ -64618,6 +64973,8 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: BaselineItemUncheckedUpdateManyWithoutBaselineNestedInput
@@ -64628,6 +64985,8 @@ export namespace Prisma {
     projectId: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
   }
@@ -64636,6 +64995,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -64645,6 +65006,8 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -64655,6 +65018,11 @@ export namespace Prisma {
     plannedStart?: Date | string | null
     plannedFinish?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
+    title?: string | null
+    type?: string | null
+    assigneeId?: string | null
+    phaseId?: string | null
+    parentId?: string | null
     baseline: BaselineCreateNestedOneWithoutItemsInput
   }
 
@@ -64665,6 +65033,11 @@ export namespace Prisma {
     plannedStart?: Date | string | null
     plannedFinish?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
+    title?: string | null
+    type?: string | null
+    assigneeId?: string | null
+    phaseId?: string | null
+    parentId?: string | null
   }
 
   export type BaselineItemUpdateInput = {
@@ -64673,6 +65046,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
     baseline?: BaselineUpdateOneRequiredWithoutItemsNestedInput
   }
 
@@ -64683,6 +65061,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BaselineItemCreateManyInput = {
@@ -64692,6 +65075,11 @@ export namespace Prisma {
     plannedStart?: Date | string | null
     plannedFinish?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
+    title?: string | null
+    type?: string | null
+    assigneeId?: string | null
+    phaseId?: string | null
+    parentId?: string | null
   }
 
   export type BaselineItemUpdateManyMutationInput = {
@@ -64700,6 +65088,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BaselineItemUncheckedUpdateManyInput = {
@@ -64709,6 +65102,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DiscussionCreateInput = {
@@ -67918,6 +68316,7 @@ export namespace Prisma {
     objectives?: SortOrder
     customerCompanyId?: SortOrder
     managerId?: SortOrder
+    directorId?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     health?: SortOrder
@@ -67933,6 +68332,12 @@ export namespace Prisma {
     templateId?: SortOrder
     workItemSeq?: SortOrder
     version?: SortOrder
+    planApprovedAt?: SortOrder
+    planApprovedById?: SortOrder
+    planSubmittedAt?: SortOrder
+    planSubmittedById?: SortOrder
+    planReturnedAt?: SortOrder
+    planReturnNote?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67953,6 +68358,7 @@ export namespace Prisma {
     objectives?: SortOrder
     customerCompanyId?: SortOrder
     managerId?: SortOrder
+    directorId?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     health?: SortOrder
@@ -67968,6 +68374,12 @@ export namespace Prisma {
     templateId?: SortOrder
     workItemSeq?: SortOrder
     version?: SortOrder
+    planApprovedAt?: SortOrder
+    planApprovedById?: SortOrder
+    planSubmittedAt?: SortOrder
+    planSubmittedById?: SortOrder
+    planReturnedAt?: SortOrder
+    planReturnNote?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67981,6 +68393,7 @@ export namespace Prisma {
     objectives?: SortOrder
     customerCompanyId?: SortOrder
     managerId?: SortOrder
+    directorId?: SortOrder
     status?: SortOrder
     priority?: SortOrder
     health?: SortOrder
@@ -67996,6 +68409,12 @@ export namespace Prisma {
     templateId?: SortOrder
     workItemSeq?: SortOrder
     version?: SortOrder
+    planApprovedAt?: SortOrder
+    planApprovedById?: SortOrder
+    planSubmittedAt?: SortOrder
+    planSubmittedById?: SortOrder
+    planReturnedAt?: SortOrder
+    planReturnNote?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -68250,6 +68669,7 @@ export namespace Prisma {
     plannedFinish?: SortOrder
     actualStart?: SortOrder
     actualFinish?: SortOrder
+    startConstraint?: SortOrder
     estimateHours?: SortOrder
     percentComplete?: SortOrder
     customerVisible?: SortOrder
@@ -68286,6 +68706,7 @@ export namespace Prisma {
     plannedFinish?: SortOrder
     actualStart?: SortOrder
     actualFinish?: SortOrder
+    startConstraint?: SortOrder
     estimateHours?: SortOrder
     percentComplete?: SortOrder
     customerVisible?: SortOrder
@@ -68313,6 +68734,7 @@ export namespace Prisma {
     plannedFinish?: SortOrder
     actualStart?: SortOrder
     actualFinish?: SortOrder
+    startConstraint?: SortOrder
     estimateHours?: SortOrder
     percentComplete?: SortOrder
     customerVisible?: SortOrder
@@ -68473,6 +68895,8 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     note?: SortOrder
+    kind?: SortOrder
+    changeRequestId?: SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
   }
@@ -68482,6 +68906,8 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     note?: SortOrder
+    kind?: SortOrder
+    changeRequestId?: SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
   }
@@ -68491,6 +68917,8 @@ export namespace Prisma {
     projectId?: SortOrder
     name?: SortOrder
     note?: SortOrder
+    kind?: SortOrder
+    changeRequestId?: SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
   }
@@ -68512,6 +68940,11 @@ export namespace Prisma {
     plannedStart?: SortOrder
     plannedFinish?: SortOrder
     estimateHours?: SortOrder
+    title?: SortOrder
+    type?: SortOrder
+    assigneeId?: SortOrder
+    phaseId?: SortOrder
+    parentId?: SortOrder
   }
 
   export type BaselineItemAvgOrderByAggregateInput = {
@@ -68525,6 +68958,11 @@ export namespace Prisma {
     plannedStart?: SortOrder
     plannedFinish?: SortOrder
     estimateHours?: SortOrder
+    title?: SortOrder
+    type?: SortOrder
+    assigneeId?: SortOrder
+    phaseId?: SortOrder
+    parentId?: SortOrder
   }
 
   export type BaselineItemMinOrderByAggregateInput = {
@@ -68534,6 +68972,11 @@ export namespace Prisma {
     plannedStart?: SortOrder
     plannedFinish?: SortOrder
     estimateHours?: SortOrder
+    title?: SortOrder
+    type?: SortOrder
+    assigneeId?: SortOrder
+    phaseId?: SortOrder
+    parentId?: SortOrder
   }
 
   export type BaselineItemSumOrderByAggregateInput = {
@@ -74270,6 +74713,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -74283,6 +74727,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     customerCompany?: CustomerCompanyCreateNestedOneWithoutProjectsInput
@@ -74312,6 +74762,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -74327,6 +74778,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -75010,6 +75467,7 @@ export namespace Prisma {
     objectives?: StringNullableFilter<"Project"> | string | null
     customerCompanyId?: UuidNullableFilter<"Project"> | string | null
     managerId?: UuidNullableFilter<"Project"> | string | null
+    directorId?: UuidNullableFilter<"Project"> | string | null
     status?: EnumProjectStatusFilter<"Project"> | $Enums.ProjectStatus
     priority?: EnumPriorityFilter<"Project"> | $Enums.Priority
     health?: EnumHealthFilter<"Project"> | $Enums.Health
@@ -75025,6 +75483,12 @@ export namespace Prisma {
     templateId?: UuidNullableFilter<"Project"> | string | null
     workItemSeq?: IntFilter<"Project"> | number
     version?: IntFilter<"Project"> | number
+    planApprovedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planApprovedById?: UuidNullableFilter<"Project"> | string | null
+    planSubmittedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planSubmittedById?: UuidNullableFilter<"Project"> | string | null
+    planReturnedAt?: DateTimeNullableFilter<"Project"> | Date | string | null
+    planReturnNote?: StringNullableFilter<"Project"> | string | null
     createdAt?: DateTimeFilter<"Project"> | Date | string
     updatedAt?: DateTimeFilter<"Project"> | Date | string
   }
@@ -76908,6 +77372,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -76921,6 +77386,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -76950,6 +77421,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -76965,6 +77437,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -77274,6 +77752,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -77287,6 +77766,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -77317,6 +77802,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -77331,6 +77817,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -77638,6 +78130,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -77651,6 +78144,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -77681,6 +78180,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -77695,6 +78195,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -78118,6 +78624,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -78154,6 +78661,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -78306,6 +78814,8 @@ export namespace Prisma {
     id?: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
     items?: BaselineItemCreateNestedManyWithoutBaselineInput
@@ -78315,6 +78825,8 @@ export namespace Prisma {
     id?: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
     items?: BaselineItemUncheckedCreateNestedManyWithoutBaselineInput
@@ -78837,6 +79349,7 @@ export namespace Prisma {
     plannedFinish?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     actualStart?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     actualFinish?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
+    startConstraint?: DateTimeNullableFilter<"WorkItem"> | Date | string | null
     estimateHours?: DecimalNullableFilter<"WorkItem"> | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFilter<"WorkItem"> | number
     customerVisible?: BoolFilter<"WorkItem"> | boolean
@@ -78991,6 +79504,8 @@ export namespace Prisma {
     projectId?: UuidFilter<"Baseline"> | string
     name?: StringFilter<"Baseline"> | string
     note?: StringNullableFilter<"Baseline"> | string | null
+    kind?: StringFilter<"Baseline"> | string
+    changeRequestId?: UuidNullableFilter<"Baseline"> | string | null
     createdById?: UuidFilter<"Baseline"> | string
     createdAt?: DateTimeFilter<"Baseline"> | Date | string
   }
@@ -79165,6 +79680,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -79178,6 +79694,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -79208,6 +79730,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -79223,6 +79746,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     phases?: PhaseUncheckedCreateNestedManyWithoutProjectInput
@@ -79312,6 +79841,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -79325,6 +79855,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -79355,6 +79891,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -79370,6 +79907,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     phases?: PhaseUncheckedUpdateManyWithoutProjectNestedInput
@@ -79449,6 +79992,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -79462,6 +80006,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -79492,6 +80042,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -79507,6 +80058,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -79543,6 +80100,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -79579,6 +80137,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -79661,6 +80220,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -79674,6 +80234,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -79704,6 +80270,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -79719,6 +80286,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -79775,6 +80348,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -79788,6 +80362,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -79818,6 +80398,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -79833,6 +80414,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -79904,6 +80491,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -79941,6 +80529,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -79977,6 +80566,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80013,6 +80603,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80217,6 +80808,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -80230,6 +80822,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -80260,6 +80858,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -80275,6 +80874,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -80358,6 +80963,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -80395,6 +81001,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -80567,6 +81174,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80604,6 +81212,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80651,6 +81260,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -80688,6 +81298,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -80719,6 +81330,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80756,6 +81368,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80803,6 +81416,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -80840,6 +81454,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -80864,6 +81479,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -80877,6 +81493,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -80907,6 +81529,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -80922,6 +81545,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -80958,6 +81587,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -80995,6 +81625,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -81031,6 +81662,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -81068,6 +81700,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -81108,6 +81741,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -81121,6 +81755,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -81151,6 +81791,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -81166,6 +81807,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -81208,6 +81855,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -81245,6 +81893,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -81287,6 +81936,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -81324,6 +81974,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -81348,6 +81999,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -81361,6 +82013,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -81391,6 +82049,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -81406,6 +82065,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -81434,6 +82099,11 @@ export namespace Prisma {
     plannedStart?: Date | string | null
     plannedFinish?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
+    title?: string | null
+    type?: string | null
+    assigneeId?: string | null
+    phaseId?: string | null
+    parentId?: string | null
   }
 
   export type BaselineItemUncheckedCreateWithoutBaselineInput = {
@@ -81442,6 +82112,11 @@ export namespace Prisma {
     plannedStart?: Date | string | null
     plannedFinish?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
+    title?: string | null
+    type?: string | null
+    assigneeId?: string | null
+    phaseId?: string | null
+    parentId?: string | null
   }
 
   export type BaselineItemCreateOrConnectWithoutBaselineInput = {
@@ -81472,6 +82147,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -81485,6 +82161,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -81515,6 +82197,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -81530,6 +82213,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -81573,12 +82262,19 @@ export namespace Prisma {
     plannedStart?: DateTimeNullableFilter<"BaselineItem"> | Date | string | null
     plannedFinish?: DateTimeNullableFilter<"BaselineItem"> | Date | string | null
     estimateHours?: DecimalNullableFilter<"BaselineItem"> | Decimal | DecimalJsLike | number | string | null
+    title?: StringNullableFilter<"BaselineItem"> | string | null
+    type?: StringNullableFilter<"BaselineItem"> | string | null
+    assigneeId?: UuidNullableFilter<"BaselineItem"> | string | null
+    phaseId?: UuidNullableFilter<"BaselineItem"> | string | null
+    parentId?: UuidNullableFilter<"BaselineItem"> | string | null
   }
 
   export type BaselineCreateWithoutItemsInput = {
     id?: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
     project: ProjectCreateNestedOneWithoutBaselinesInput
@@ -81589,6 +82285,8 @@ export namespace Prisma {
     projectId: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
   }
@@ -81613,6 +82311,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     project?: ProjectUpdateOneRequiredWithoutBaselinesNestedInput
@@ -81623,6 +82323,8 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -81634,6 +82336,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -81647,6 +82350,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -81677,6 +82386,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -81692,6 +82402,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -81732,6 +82448,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -81745,6 +82462,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -81775,6 +82498,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -81790,6 +82514,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -82134,6 +82864,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -82147,6 +82878,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -82177,6 +82914,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -82192,6 +82930,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -82232,6 +82976,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -82245,6 +82990,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -82275,6 +83026,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -82290,6 +83042,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -82314,6 +83072,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -82327,6 +83086,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -82357,6 +83122,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -82372,6 +83138,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -82477,6 +83249,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -82490,6 +83263,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -82520,6 +83299,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -82535,6 +83315,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -83483,6 +84269,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -83496,6 +84283,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -83526,6 +84319,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -83541,6 +84335,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -83577,6 +84377,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -83614,6 +84415,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -83754,6 +84556,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -83767,6 +84570,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -83797,6 +84606,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -83812,6 +84622,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -83854,6 +84670,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -83891,6 +84708,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -84306,6 +85124,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -84319,6 +85138,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -84349,6 +85174,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -84364,6 +85190,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -84528,6 +85360,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -84541,6 +85374,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -84571,6 +85410,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -84586,6 +85426,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -84700,6 +85546,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -84737,6 +85584,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -84857,6 +85705,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -84894,6 +85743,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -84918,6 +85768,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -84931,6 +85782,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -84961,6 +85818,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -84976,6 +85834,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -85016,6 +85880,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85029,6 +85894,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -85059,6 +85930,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85074,6 +85946,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -85098,6 +85976,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85111,6 +85990,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -85141,6 +86026,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85156,6 +86042,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -85196,6 +86088,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85209,6 +86102,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -85239,6 +86138,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85254,6 +86154,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -85278,6 +86184,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85291,6 +86198,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -85321,6 +86234,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85336,6 +86250,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -85376,6 +86296,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85389,6 +86310,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -85419,6 +86346,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85434,6 +86362,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -85458,6 +86392,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85471,6 +86406,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     organization: OrganizationCreateNestedOneWithoutProjectsInput
@@ -85501,6 +86442,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85516,6 +86458,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: ProjectMemberUncheckedCreateNestedManyWithoutProjectInput
@@ -85556,6 +86504,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85569,6 +86518,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -85599,6 +86554,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -85614,6 +86570,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -85962,6 +86924,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -85977,6 +86940,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -86343,6 +87312,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -86356,6 +87326,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     customerCompany?: CustomerCompanyUpdateOneWithoutProjectsNestedInput
@@ -86385,6 +87361,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -86400,6 +87377,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -86426,6 +87409,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -86441,6 +87425,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -87180,6 +88170,7 @@ export namespace Prisma {
     description?: string | null
     objectives?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -87195,6 +88186,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -87263,6 +88260,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87276,6 +88274,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -87305,6 +88309,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87320,6 +88325,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -87346,6 +88357,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87361,6 +88373,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -87472,6 +88490,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -87486,6 +88505,12 @@ export namespace Prisma {
     templateId?: string | null
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -87515,6 +88540,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87528,6 +88554,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -87558,6 +88590,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87572,6 +88605,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -87599,6 +88638,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87613,6 +88653,12 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -87636,6 +88682,7 @@ export namespace Prisma {
     objectives?: string | null
     customerCompanyId?: string | null
     managerId?: string | null
+    directorId?: string | null
     status?: $Enums.ProjectStatus
     priority?: $Enums.Priority
     health?: $Enums.Health
@@ -87650,6 +88697,12 @@ export namespace Prisma {
     customerVisible?: boolean
     workItemSeq?: number
     version?: number
+    planApprovedAt?: Date | string | null
+    planApprovedById?: string | null
+    planSubmittedAt?: Date | string | null
+    planSubmittedById?: string | null
+    planReturnedAt?: Date | string | null
+    planReturnNote?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -87691,6 +88744,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87704,6 +88758,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     organization?: OrganizationUpdateOneRequiredWithoutProjectsNestedInput
@@ -87734,6 +88794,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87748,6 +88809,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: ProjectMemberUncheckedUpdateManyWithoutProjectNestedInput
@@ -87775,6 +88842,7 @@ export namespace Prisma {
     objectives?: NullableStringFieldUpdateOperationsInput | string | null
     customerCompanyId?: NullableStringFieldUpdateOperationsInput | string | null
     managerId?: NullableStringFieldUpdateOperationsInput | string | null
+    directorId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
     priority?: EnumPriorityFieldUpdateOperationsInput | $Enums.Priority
     health?: EnumHealthFieldUpdateOperationsInput | $Enums.Health
@@ -87789,6 +88857,12 @@ export namespace Prisma {
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
     workItemSeq?: IntFieldUpdateOperationsInput | number
     version?: IntFieldUpdateOperationsInput | number
+    planApprovedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planApprovedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planSubmittedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planSubmittedById?: NullableStringFieldUpdateOperationsInput | string | null
+    planReturnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    planReturnNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -87829,6 +88903,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -87883,6 +88958,8 @@ export namespace Prisma {
     id?: string
     name: string
     note?: string | null
+    kind?: string
+    changeRequestId?: string | null
     createdById: string
     createdAt?: Date | string
   }
@@ -88060,6 +89137,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88096,6 +89174,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88130,6 +89209,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88264,6 +89344,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: BaselineItemUpdateManyWithoutBaselineNestedInput
@@ -88273,6 +89355,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: BaselineItemUncheckedUpdateManyWithoutBaselineNestedInput
@@ -88282,6 +89366,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     note?: NullableStringFieldUpdateOperationsInput | string | null
+    kind?: StringFieldUpdateOperationsInput | string
+    changeRequestId?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -88589,6 +89675,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -88626,6 +89713,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88662,6 +89750,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88696,6 +89785,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88761,6 +89851,7 @@ export namespace Prisma {
     plannedFinish?: Date | string | null
     actualStart?: Date | string | null
     actualFinish?: Date | string | null
+    startConstraint?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
     percentComplete?: number
     customerVisible?: boolean
@@ -88835,6 +89926,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88871,6 +89963,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -88905,6 +89998,7 @@ export namespace Prisma {
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     actualFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    startConstraint?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     percentComplete?: IntFieldUpdateOperationsInput | number
     customerVisible?: BoolFieldUpdateOperationsInput | boolean
@@ -89069,6 +90163,11 @@ export namespace Prisma {
     plannedStart?: Date | string | null
     plannedFinish?: Date | string | null
     estimateHours?: Decimal | DecimalJsLike | number | string | null
+    title?: string | null
+    type?: string | null
+    assigneeId?: string | null
+    phaseId?: string | null
+    parentId?: string | null
   }
 
   export type BaselineItemUpdateWithoutBaselineInput = {
@@ -89077,6 +90176,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BaselineItemUncheckedUpdateWithoutBaselineInput = {
@@ -89085,6 +90189,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BaselineItemUncheckedUpdateManyWithoutBaselineInput = {
@@ -89093,6 +90202,11 @@ export namespace Prisma {
     plannedStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     plannedFinish?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     estimateHours?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    title?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: NullableStringFieldUpdateOperationsInput | string | null
+    assigneeId?: NullableStringFieldUpdateOperationsInput | string | null
+    phaseId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type DeliverableVersionCreateManyDeliverableInput = {

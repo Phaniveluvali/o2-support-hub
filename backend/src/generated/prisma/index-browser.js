@@ -267,6 +267,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   objectives: 'objectives',
   customerCompanyId: 'customerCompanyId',
   managerId: 'managerId',
+  directorId: 'directorId',
   status: 'status',
   priority: 'priority',
   health: 'health',
@@ -282,6 +283,12 @@ exports.Prisma.ProjectScalarFieldEnum = {
   templateId: 'templateId',
   workItemSeq: 'workItemSeq',
   version: 'version',
+  planApprovedAt: 'planApprovedAt',
+  planApprovedById: 'planApprovedById',
+  planSubmittedAt: 'planSubmittedAt',
+  planSubmittedById: 'planSubmittedById',
+  planReturnedAt: 'planReturnedAt',
+  planReturnNote: 'planReturnNote',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -325,6 +332,7 @@ exports.Prisma.WorkItemScalarFieldEnum = {
   plannedFinish: 'plannedFinish',
   actualStart: 'actualStart',
   actualFinish: 'actualFinish',
+  startConstraint: 'startConstraint',
   estimateHours: 'estimateHours',
   percentComplete: 'percentComplete',
   customerVisible: 'customerVisible',
@@ -364,6 +372,8 @@ exports.Prisma.BaselineScalarFieldEnum = {
   projectId: 'projectId',
   name: 'name',
   note: 'note',
+  kind: 'kind',
+  changeRequestId: 'changeRequestId',
   createdById: 'createdById',
   createdAt: 'createdAt'
 };
@@ -374,7 +384,12 @@ exports.Prisma.BaselineItemScalarFieldEnum = {
   workItemId: 'workItemId',
   plannedStart: 'plannedStart',
   plannedFinish: 'plannedFinish',
-  estimateHours: 'estimateHours'
+  estimateHours: 'estimateHours',
+  title: 'title',
+  type: 'type',
+  assigneeId: 'assigneeId',
+  phaseId: 'phaseId',
+  parentId: 'parentId'
 };
 
 exports.Prisma.DiscussionScalarFieldEnum = {
@@ -717,6 +732,7 @@ exports.Health = exports.$Enums.Health = {
 };
 
 exports.ProjectRole = exports.$Enums.ProjectRole = {
+  DIRECTOR: 'DIRECTOR',
   MANAGER: 'MANAGER',
   MEMBER: 'MEMBER',
   VIEWER: 'VIEWER',

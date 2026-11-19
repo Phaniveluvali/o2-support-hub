@@ -6,7 +6,8 @@ import { useLoad, useDebounced } from '../lib/hooks.js';
 import { useLive } from '../lib/live.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { addDaysISO, todayISO, fmtDate, projectColor, labelize } from '../lib/format.js';
-import { Avatar, Card, Empty, ErrorBox, Field, HealthBadge, Loading, Modal, Pagination, Segmented, Select, StatusBadge, useToast, fieldErrors, ProjectDot } from '../components/ui.jsx';
+import { ScheduleChip, DaysVar } from '../lib/schedule.jsx';
+import { Avatar, Card, Empty, ErrorBox, Field, HealthBadge, Notice, Loading, Modal, Pagination, Segmented, Select, StatusBadge, useToast, fieldErrors, ProjectDot, ProjectChip } from '../components/ui.jsx';
 import { ProjectCard } from './Home.jsx';
 
 /** Short project code from the name: initials of up to 4 words, or the first 3 letters. */
@@ -18,6 +19,7 @@ export const codeFrom = (name) => {
 };
 
 const STEPS = [['details', 'Project details', Layers], ['team', 'Team', Users], ['review', 'Review & create', Check]];
+// After creating, the wizard continues on the project's Plan tab: build tasks, then approve & lock the original plan.
 
 function Steps({ step }) {
   const i = STEPS.findIndex((s) => s[0] === step);
@@ -77,7 +79,7 @@ export function NewProjectDialog({ onClose }) {
   const refs = useLoad(() => Promise.all([get('/org/customers'), get('/org/members', { pageSize: 200 }), get('/org/templates'), get('/workload').catch(() => ({ data: [] }))]), []);
   const [customers, members, templates, workload] = refs.data ? refs.data.map((r) => r.data) : [[], [], [], []];
   const [step, setStep] = useState('details');
-  const [f, setF] = useState({ name: '', code: '', customerCompanyId: '', plannedStart: todayISO(), plannedFinish: addDaysISO(todayISO(), 90), share: true, templateId: '', managerId: user.id, priority: 'MEDIUM', description: '', objectives: '', budgetAmount: '', budgetCurrency: 'USD', customerContactIds: null });
+  const [f, setF] = useState({ name: '', code: '', customerCompanyId: '', plannedStart: todayISO(), plannedFinish: addDaysISO(todayISO(), 90), share: true, templateId: 'simple', managerId: user.id, directorId: '', priority: 'MEDIUM', description: '', objectives: '', budgetAmount: '', budgetCurrency: 'USD', customerContactIds: null });
   const [team, setTeam] = useState({});
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -86,20 +88,21 @@ export function NewProjectDialog({ onClose }) {
   const managers = internal.filter((m) => ['ADMIN', 'MANAGER'].includes(m.role));
   const contacts = members.filter((m) => m.role === 'CUSTOMER' && m.status === 'ACTIVE' && m.customerCompany?.id === f.customerCompanyId);
   const chosenContacts = f.customerContactIds ?? contacts.map((c) => c.userId);
-  const tpl = templates.find((t) => t.id === f.templateId) || templates.find((t) => t.isDefault);
-  const detailsOk = f.name.trim().length >= 2 && f.plannedFinish >= f.plannedStart && f.managerId;
+  const tpl = templates.find((t) => t.id === f.templateId);
+  const directors = managers.filter((m) => m.userId !== f.managerId);
+  const detailsOk = f.name.trim().length >= 2 && f.plannedFinish >= f.plannedStart && f.managerId && (directors.length ? f.directorId && f.directorId !== f.managerId : true);
   const submit = async () => {
     setErr(null); setBusy(true);
     const base = f.code || codeFrom(f.name);
-    const body = { name: f.name.trim(), managerId: f.managerId, plannedStart: f.plannedStart, plannedFinish: f.plannedFinish, status: 'ACTIVE', priority: f.priority,
+    const body = { name: f.name.trim(), managerId: f.managerId, directorId: f.directorId || null, plannedStart: f.plannedStart, plannedFinish: f.plannedFinish, status: 'DRAFT', priority: f.priority,
       description: f.description || null, objectives: f.objectives || null,
       customerCompanyId: f.customerCompanyId || null, customerVisible: Boolean(f.customerCompanyId && f.share), customerContactIds: f.customerCompanyId ? chosenContacts : [],
-      team: Object.entries(team).filter(([id]) => id !== f.managerId).map(([userId, t]) => ({ userId, ...t })), templateId: f.templateId || null,
+      team: Object.entries(team).filter(([id]) => id !== f.managerId && id !== f.directorId).map(([userId, t]) => ({ userId, ...t })), templateId: f.templateId || null,
       ...(f.budgetAmount && { budgetAmount: Number(f.budgetAmount), budgetCurrency: f.budgetCurrency }),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC' };
     try {
       for (let i = 0; i < 6; i++) {
-        try { const p = await post('/projects', { ...body, code: i ? `${base.slice(0, 8)}${i + 1}` : base }); toast(`${p.name} created with ${body.team.length + 1} people`, 'success'); nav(`/projects/${p.id}`); return; }
+        try { const p = await post('/projects', { ...body, code: i ? `${base.slice(0, 8)}${i + 1}` : base }); toast(`${p.name} created with ${body.team.length + 1} people — now build the plan`, 'success'); nav(`/projects/${p.id}/plan`); return; }
         catch (x) { if (!(x.status === 409 && !f.code)) throw x; }
       }
     } catch (x) { setErr(x); if (fieldErrors(x).name || fieldErrors(x).code) setStep('details'); } finally { setBusy(false); }
@@ -111,10 +114,11 @@ export function NewProjectDialog({ onClose }) {
       <button className="btn btn-light" onClick={onClose}>Cancel</button>
       {step === 'details' && <button className="btn btn-primary" disabled={!detailsOk} onClick={() => setStep('team')}>Next: choose team <ChevronRight size={15} /></button>}
       {step === 'team' && <button className="btn btn-primary" onClick={() => setStep('review')}>Next: review <ChevronRight size={15} /></button>}
-      {step === 'review' && <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? 'Creating…' : 'Create project'}</button>}
+      {step === 'review' && <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? 'Creating…' : 'Create project & build plan'}</button>}
     </>
   );
   const mgrName = internal.find((m) => m.userId === f.managerId)?.name;
+  const dirName = internal.find((m) => m.userId === f.directorId)?.name;
   return (
     <Modal open size="lg" onClose={onClose} title="New project" footer={footer}>
       <Steps step={step} />
@@ -124,33 +128,37 @@ export function NewProjectDialog({ onClose }) {
           <div className="row">
             <div className="col-md-8"><Field label="Project name" error={fe.name}>{(id) => <input id={id} className="form-control" placeholder="e.g. Customer portal rollout" value={f.name} onChange={set('name')} autoFocus />}</Field></div>
             <div className="col-md-4"><Field label="Short code" hint="Used in task numbers" error={fe.code}>{(id) => <input id={id} className="form-control text-uppercase" maxLength={10} placeholder={f.name ? codeFrom(f.name) : 'CPR'} value={f.code} onChange={(e) => set('code')(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase())} />}</Field></div>
-            <div className="col-md-6"><Field label="Project manager">{(id) => <Select id={id} value={f.managerId} onChange={set('managerId')} disabled={role !== 'ADMIN' && managers.length <= 1} options={managers.map((m) => ({ value: m.userId, label: `${m.name}${m.userId === user.id ? ' (you)' : ''}${m.title ? ` — ${m.title}` : ''}` }))} />}</Field></div>
+            <div className="col-md-6"><Field label="Project director" hint="Approves the plan, documents and change requests" error={f.directorId && f.directorId === f.managerId ? 'Must be different from the project manager' : undefined}>{(id) => <Select id={id} value={f.directorId} onChange={set('directorId')} placeholder={directors.length ? 'Choose the director' : 'No other manager yet — add one in Settings → Users'} disabled={!directors.length} options={directors.map((m) => ({ value: m.userId, label: `${m.name}${m.userId === user.id ? ' (you)' : ''}${m.title ? ` — ${m.title}` : ''}` }))} />}</Field></div>
+            <div className="col-md-6"><Field label="Project manager" hint="Builds the plan, runs the team and approves their time">{(id) => <Select id={id} value={f.managerId} onChange={(v) => setF((x) => ({ ...x, managerId: v, directorId: x.directorId === v ? '' : x.directorId }))} disabled={role !== 'ADMIN' && managers.length <= 1} options={managers.map((m) => ({ value: m.userId, label: `${m.name}${m.userId === user.id ? ' (you)' : ''}${m.title ? ` — ${m.title}` : ''}` }))} />}</Field></div>
             <div className="col-md-6"><Field label="Client" hint="Leave empty for an internal project">{(id) => <Select id={id} value={f.customerCompanyId} onChange={(v) => setF((x) => ({ ...x, customerCompanyId: v || '', customerContactIds: null }))} placeholder="Internal project" options={customers.map((c) => ({ value: c.id, label: c.name }))} />}</Field></div>
             <div className="col-6 col-md-3"><Field label="Start date">{(id) => <input id={id} type="date" className="form-control" value={f.plannedStart} onChange={set('plannedStart')} />}</Field></div>
-            <div className="col-6 col-md-3"><Field label="Target finish" error={f.plannedFinish < f.plannedStart ? 'Must be after the start' : fe.plannedFinish}>{(id) => <input id={id} type="date" className="form-control" value={f.plannedFinish} min={f.plannedStart} onChange={set('plannedFinish')} />}</Field></div>
+            <div className="col-6 col-md-3"><Field label="Target finish" hint="Rough guess is fine — the end date follows your tasks" error={f.plannedFinish < f.plannedStart ? 'Must be after the start' : fe.plannedFinish}>{(id) => <input id={id} type="date" className="form-control" value={f.plannedFinish} min={f.plannedStart} onChange={set('plannedFinish')} />}</Field></div>
             <div className="col-6 col-md-3"><Field label="Priority">{(id) => <Select id={id} value={f.priority} onChange={set('priority')} options={[['LOW', 'Low'], ['MEDIUM', 'Normal'], ['HIGH', 'High'], ['CRITICAL', 'Critical']].map(([v, l]) => ({ value: v, label: l }))} />}</Field></div>
             <div className="col-6 col-md-3"><Field label="Budget (optional)">{(id) => <div className="input-group"><input id={id} type="number" min="0" className="form-control" value={f.budgetAmount} onChange={set('budgetAmount')} /><select className="form-select" style={{ maxWidth: 82 }} value={f.budgetCurrency} onChange={set('budgetCurrency')} aria-label="Currency">{['USD', 'EUR', 'GBP', 'INR', 'AED', 'OMR', 'SAR'].map((c) => <option key={c}>{c}</option>)}</select></div>}</Field></div>
           </div>
-          <Field label="Plan template" hint={tpl ? `Creates ${tpl.phases.length} phases: ${tpl.phases.map((p) => p.name).join(' → ')}` : undefined}>{(id) => <Select id={id} value={f.templateId} onChange={set('templateId')} placeholder={`${templates.find((t) => t.isDefault)?.name || 'Standard plan'} (default)`} options={templates.filter((t) => !t.isDefault).map((t) => ({ value: t.id, label: t.name }))} />}</Field>
+          <Field label="Start the plan with" hint={f.templateId === 'simple' ? 'Four stages — Plan → Build → Test → Close. You add the tasks; dates are calculated for you.' : f.templateId === 'none' ? 'No stages. Add your own stages and tasks on the next screen.' : tpl ? `Creates ${tpl.phases.length} stages: ${tpl.phases.map((p) => p.name).join(' → ')}, with their milestones` : undefined}>{(id) => <Select id={id} value={f.templateId} onChange={set('templateId')}
+            options={[{ value: 'simple', label: 'Simple stages (recommended)' }, { value: 'none', label: 'Empty plan' }, ...templates.map((t) => ({ value: t.id, label: `Template: ${t.name}` }))]} />}</Field>
           <Field label="Goal / objectives" hint="What does success look like? Shown on the project overview.">{(id) => <textarea id={id} rows={2} className="form-control" value={f.objectives} onChange={set('objectives')} placeholder="e.g. Launch the new portal by Q2 and cut support calls by 20%" />}</Field>
         </>
       ) : step === 'team' ? (
         <>
-          <p className="small text-muted mb-2">Pick the people who will work on <strong>{f.name}</strong>. <strong>{mgrName}</strong> is the project manager.</p>
-          <TeamPicker people={internal} team={team} setTeam={setTeam} managerId={f.managerId} workload={workload} />
+          <p className="small text-muted mb-2">Pick the resources who will work on <strong>{f.name}</strong>. <strong>{dirName}</strong> is the project director and <strong>{mgrName}</strong> is the project manager.</p>
+          <TeamPicker people={internal.filter((m) => m.userId !== f.directorId)} team={team} setTeam={setTeam} managerId={f.managerId} workload={workload} />
           {f.customerCompanyId && contacts.length > 0 && <div className="mt-3"><div className="form-label">Client contacts who can follow the project</div>
             <div className="d-flex flex-wrap gap-2">{contacts.map((c) => { const on = chosenContacts.includes(c.userId); return (
               <label key={c.userId} className={`btn btn-sm ${on ? 'btn-outline-primary' : 'btn-light'}`}><input type="checkbox" className="visually-hidden" checked={on} onChange={() => set('customerContactIds')(on ? chosenContacts.filter((x) => x !== c.userId) : [...chosenContacts, c.userId])} /><Avatar sm name={c.name} /> {c.name}</label>); })}</div></div>}
         </>
       ) : (
         <>
+          <Notice>Next: the project manager adds the tasks, sub-tasks and milestones, then <b>sends the plan to {dirName || 'the project director'}</b>, who approves and locks it as the original plan. From then on the project is tracked against that original.</Notice>
           <dl className="props">
             <dt>Project</dt><dd className="fw-semibold">{f.name} <span className="mono">{f.code || codeFrom(f.name)}</span></dd>
             <dt>Client</dt><dd>{customers.find((c) => c.id === f.customerCompanyId)?.name || 'Internal project'}</dd>
             <dt>Dates</dt><dd>{fmtDate(f.plannedStart)} → {fmtDate(f.plannedFinish)}</dd>
-            <dt>Plan</dt><dd>{tpl ? `${tpl.name}: ${tpl.phases.length} phases with milestones` : 'Standard plan'}</dd>
+            <dt>Plan</dt><dd>{f.templateId === 'simple' ? 'Simple stages: Plan → Build → Test → Close' : f.templateId === 'none' ? 'Empty plan' : tpl ? `${tpl.name}: ${tpl.phases.length} stages with milestones` : 'Simple stages'}</dd>
+            <dt>Director</dt><dd>{dirName}</dd>
             <dt>Manager</dt><dd>{mgrName}</dd>
-            <dt>Team</dt><dd>{Object.keys(team).length ? <span className="d-flex flex-wrap gap-2">{Object.entries(team).map(([id, t]) => { const p = internal.find((m) => m.userId === id); return <span key={id} className="pill pill-neutral"><Avatar sm name={p?.name} />{p?.name} · {t.role === 'MANAGER' ? 'Co-manager' : labelize(t.role)}{t.allocationPct < 100 ? ` · ${t.allocationPct}%` : ''}</span>; })}</span> : <span className="text-muted">Only the manager for now</span>}</dd>
+            <dt>Team</dt><dd>{Object.keys(team).length ? <span className="d-flex flex-wrap gap-2">{Object.entries(team).map(([id, t]) => { const p = internal.find((m) => m.userId === id); return <span key={id} className="pill pill-neutral"><Avatar sm name={p?.name} />{p?.name} · {t.role === 'MANAGER' ? 'Co-manager' : labelize(t.role)}{t.allocationPct < 100 ? ` · ${t.allocationPct}%` : ''}</span>; })}</span> : <span className="text-muted">Only the director and manager for now</span>}</dd>
             {f.budgetAmount && <><dt>Budget</dt><dd>{Number(f.budgetAmount).toLocaleString()} {f.budgetCurrency}</dd></>}
           </dl>
           {f.customerCompanyId && <div className="form-check form-switch"><input className="form-check-input" type="checkbox" role="switch" id="np-share" checked={f.share} onChange={(e) => set('share')(e.target.checked)} />
@@ -208,10 +216,10 @@ export default function Projects() {
   const creating = params.get('new') === '1' && can('project.create');
   const chooseLayout = (v) => { setLayout(v); try { localStorage.setItem('o2.projectsLayout', v); } catch { /* ignore */ } };
   const rows = data?.data || [];
-  const sum = useMemo(() => ({ total: rows.length, red: rows.filter((p) => p.health === 'RED').length, amber: rows.filter((p) => p.health === 'AMBER').length, overdue: rows.reduce((s, p) => s + (p.counts?.overdue || 0), 0) }), [rows]);
+  const sum = useMemo(() => ({ total: rows.length, late: rows.filter((p) => p.schedule?.status === 'DELAYED').length, risk: rows.filter((p) => p.schedule?.status === 'AT_RISK').length, draft: rows.filter((p) => p.planApprovedAt === null && !['CANCELLED', 'ARCHIVED'].includes(p.status)).length }), [rows]);
   return (
     <>
-      <div className="page-header"><div><h1 className="h-page">{isCustomer ? 'My projects' : 'Projects'}</h1><div className="sub">{isCustomer ? 'Projects your team has shared with you.' : `${sum.total} project${sum.total === 1 ? '' : 's'}${sum.red ? ` · ${sum.red} off track` : ''}${sum.amber ? ` · ${sum.amber} at risk` : ''}${sum.overdue ? ` · ${sum.overdue} overdue tasks` : ''}`}</div></div>
+      <div className="page-header"><div><h1 className="h-page">{isCustomer ? 'My projects' : 'Projects'}</h1><div className="sub">{isCustomer ? 'Projects your team has shared with you.' : `${sum.total} project${sum.total === 1 ? '' : 's'}${sum.late ? ` · ${sum.late} running late` : ''}${sum.risk ? ` · ${sum.risk} at risk` : ''}${sum.draft ? ` · ${sum.draft} plan${sum.draft === 1 ? '' : 's'} not approved yet` : ''}`}</div></div>
         {can('project.create') && <button className="btn btn-primary" onClick={() => setParams({ new: '1' })}><Plus size={16} /> New project</button>}</div>
       <div className="filters">
         <div className="position-relative" style={{ maxWidth: 260 }}><Search size={15} className="position-absolute text-muted" style={{ left: 10, top: 11 }} /><input className="form-control ps-4" placeholder="Search projects" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} aria-label="Search projects" /></div>
@@ -226,17 +234,18 @@ export default function Projects() {
         : layout === 'timeline' ? <PortfolioTimeline rows={rows} />
         : (
           <div className="card" style={{ overflow: 'hidden' }}><div className="table-wrap"><table className="table table-hover mb-0">
-            <thead><tr><th>Project</th>{!isCustomer && <th>Manager</th>}<th>Status</th><th>Health</th><th style={{ width: 170 }}>Progress</th><th>Tasks</th><th>Milestones</th><th>Finish</th>{!isCustomer && <th>Team</th>}</tr></thead>
+            <thead><tr><th>Project</th>{!isCustomer && <th>Manager</th>}<th>Status</th>{!isCustomer && <th title="Automatic: compared with the approved plan">Schedule</th>}<th title="The project manager's own rating">Manager's view</th><th style={{ width: 170 }}>Progress</th><th>Tasks</th><th>Milestones</th><th title="Planned end date (from the approved plan when there is one)">Planned end</th>{!isCustomer && <th>Team</th>}</tr></thead>
             <tbody>{rows.map((p) => (
               <tr key={p.id} className="row-link" onClick={() => nav(`/projects/${p.id}`)}>
-                <td><Link to={`/projects/${p.id}`} className="fw-semibold text-body d-inline-flex align-items-center gap-2" onClick={(e) => e.stopPropagation()}><ProjectDot code={p.code} />{p.name}</Link><div className="tk-meta"><span className="mono">{p.code}</span> · {p.customerName || 'Internal'}</div></td>
+                <td style={{ minWidth: 240 }}><div className="d-flex align-items-center gap-2"><ProjectChip code={p.code} size={24} /><div className="min-w-0"><Link to={`/projects/${p.id}`} className="fw-semibold" onClick={(e) => e.stopPropagation()}>{p.name}</Link><div className="tk-meta"><span className="mono">{p.code}</span> · {p.customerName || 'Internal'}</div></div></div></td>
                 {!isCustomer && <td className="small text-nowrap">{p.managerName ? <span className="d-inline-flex align-items-center gap-2"><Avatar sm name={p.managerName} />{p.managerName}</span> : '—'}</td>}
                 <td><StatusBadge status={p.status} /></td>
+                {!isCustomer && <td className="small">{p.schedule ? <div><ScheduleChip status={p.schedule.status} />{p.schedule.finishVariance ? <div className="mt-1"><DaysVar days={p.schedule.finishVariance} /></div> : null}</div> : ['CANCELLED', 'ARCHIVED'].includes(p.status) ? <span className="text-muted">—</span> : <span className="text-muted" title="The plan has not been approved yet">Plan not approved</span>}</td>}
                 <td><HealthBadge health={p.health} /></td>
                 <td><div className="d-flex align-items-center gap-2"><div className="meter flex-grow-1" style={{ '--pc': projectColor(p.code) }}><span style={{ width: `${p.progress || 0}%` }} /></div><span className="small num">{Math.round(p.progress || 0)}%</span></div></td>
-                <td className="small text-nowrap num">{p.counts?.open ?? '—'} open{p.counts?.overdue ? <span className="text-danger fw-semibold"> · {p.counts.overdue} late</span> : ''}</td>
+                <td className="small text-nowrap num">{p.counts?.open ?? '—'} open{(p.schedule ? p.schedule.delayed : p.counts?.overdue) ? <span className="text-danger fw-semibold"> · {p.schedule ? p.schedule.delayed : p.counts.overdue} late</span> : ''}</td>
                 <td className="small num">{p.milestones ? `${p.milestones.done}/${p.milestones.total}` : '—'}</td>
-                <td className="small text-nowrap"><CalendarDays size={12} className="text-muted" /> {fmtDate(p.plannedFinish)}</td>
+                <td className="small text-nowrap"><CalendarDays size={12} className="text-muted" /> {fmtDate(p.schedule?.originalFinish || p.plannedFinish)}{p.schedule && p.schedule.status !== 'COMPLETED' && p.schedule.finishVariance > 0 && <div className="text-danger">expected {fmtDate(p.schedule.forecastFinish)}</div>}</td>
                 {!isCustomer && <td className="small num"><UserCheck size={13} className="text-muted" /> {p.teamSize ?? '—'}</td>}
               </tr>))}</tbody>
           </table></div></div>)}

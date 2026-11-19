@@ -9,7 +9,7 @@ export function project(p, access, extra = {}) {
     id: p.id, code: p.code, name: p.name, description: p.description, objectives: p.objectives,
     status: p.status, health: p.health, priority: p.priority,
     plannedStart: fmtDate(p.plannedStart), plannedFinish: fmtDate(p.plannedFinish), timezone: p.timezone,
-    customerCompanyId: p.customerCompanyId, managerId: p.managerId, customerVisible: p.customerVisible,
+    customerCompanyId: p.customerCompanyId, managerId: p.managerId, directorId: p.directorId ?? null, customerVisible: p.customerVisible,
     role: access?.role, ...extra,
   };
   if (access?.isCustomer) { delete base.customerVisible; delete base.priority; return base; }
@@ -30,6 +30,7 @@ export function workItem(i, access, extra = {}) {
   if (access?.isCustomer) return { ...base, ...extra.customer };
   return {
     ...base, assigneeId: i.assigneeId, priority: i.priority, actualStart: fmtDate(i.actualStart), actualFinish: fmtDate(i.actualFinish),
+    fixedStart: i.startConstraint === undefined ? undefined : fmtDate(i.startConstraint),
     estimateHours: num(i.estimateHours), customerVisible: i.customerVisible, labels: i.labels, version: i.version,
     createdAt: i.createdAt, updatedAt: i.updatedAt, ...extra.internal,
   };

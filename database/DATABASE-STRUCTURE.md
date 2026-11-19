@@ -1,8 +1,8 @@
 # O2 Support Hub - Database structure
 
-PostgreSQL schema `public` · 45 tables · 17 enum types · 62 foreign keys · generated 2026-11-18
+PostgreSQL schema `public` · 45 tables · 17 enum types · 62 foreign keys · 56 indexes · 6 migrations · generated 2026-11-19
 
-All primary keys are UUIDs. Timestamps are `timestamptz` (UTC); plain dates are `date`. Every business table is scoped to an organisation, directly or through its project. Columns ending in `Id` without an arrow (for example `assigneeId`, `createdById`) point to a row in another table — usually `User` — and are checked by the application rather than by a database foreign key. The authoritative model definition is `prisma/schema.prisma`; the SQL history is in `prisma/migrations/`.
+All primary keys are UUIDs. Timestamps are `timestamptz` (UTC); plain dates are `date`. Every business table is scoped to an organisation, directly or through its project. The original (approved) plan is protected by the trigger `o2_protect_original_baseline` on `Baseline` and `BaselineItem`. Columns ending in `Id` without an arrow (for example `assigneeId`, `createdById`) point to a row in another table — usually `User` — and are checked by the application rather than by a database foreign key. The authoritative model definition is `prisma/schema.prisma`; the SQL history is in `prisma/migrations/`.
 
 ## Contents
 
@@ -12,6 +12,7 @@ All primary keys are UUIDs. Timestamps are `timestamptz` (UTC); plain dates are 
 - **Collaboration and governance**: [Comment](#comment), [Discussion](#discussion), [StatusUpdate](#statusupdate), [Deliverable](#deliverable), [DeliverableVersion](#deliverableversion), [Approval](#approval), [Risk](#risk), [Issue](#issue), [Decision](#decision), [ChangeRequest](#changerequest)
 - **Support desk**: [Ticket](#ticket), [TicketCategory](#ticketcategory), [TicketLink](#ticketlink), [SlaPolicy](#slapolicy), [CannedResponse](#cannedresponse), [KnowledgeArticle](#knowledgearticle)
 - **Files and system**: [FileObject](#fileobject), [FileBlob](#fileblob), [_prisma_migrations](#prismamigrations)
+- [Relationship diagram](#relationship-diagram) · [Enum types](#enum-types) · [Triggers](#triggers) · [Migrations](#migrations)
 
 ## Relationship diagram
 
@@ -34,6 +35,7 @@ erDiagram
   Deliverable ||--o{ DeliverableVersion : "deliverableId"
   WorkItem ||--o{ Dependency : "predecessorId"
   Project ||--o{ Dependency : "projectId"
+  WorkItem ||--o{ Dependency : "successorId"
   Project ||--o{ Discussion : "projectId"
   DeliverableVersion ||--o{ FileObject : "deliverableVersionId"
   Organization ||--o{ FileObject : "organizationId"
@@ -93,7 +95,7 @@ erDiagram
 | `MembershipStatus` | ACTIVE, DISABLED |
 | `OrgRole` | ADMIN, MANAGER, EMPLOYEE, CUSTOMER |
 | `Priority` | LOW, MEDIUM, HIGH, CRITICAL |
-| `ProjectRole` | MANAGER, MEMBER, VIEWER, CUSTOMER |
+| `ProjectRole` | MANAGER, MEMBER, VIEWER, CUSTOMER, DIRECTOR |
 | `ProjectStatus` | DRAFT, ACTIVE, ON_HOLD, COMPLETED, CANCELLED, ARCHIVED |
 | `RegisterStatus` | OPEN, IN_PROGRESS, CLOSED |
 | `TicketStatus` | NEW, OPEN, IN_PROGRESS, WAITING_ON_CUSTOMER, RESOLVED, CLOSED |
@@ -102,6 +104,24 @@ erDiagram
 | `Visibility` | INTERNAL, PUBLIC |
 | `WorkItemType` | MODULE, TASK, SUBTASK, MILESTONE |
 | `WorkStatus` | TODO, IN_PROGRESS, BLOCKED, IN_REVIEW, DONE, CANCELLED |
+
+## Triggers
+
+| Trigger | Table | Function | Purpose |
+|---|---|---|---|
+| `Baseline_protect_original` | `Baseline` | `o2_protect_original_baseline()` | Blocks UPDATE/DELETE of the original (first approved) baseline so the agreed plan can never be changed |
+| `BaselineItem_protect_original` | `BaselineItem` | `o2_protect_original_baseline()` | Blocks UPDATE/DELETE of the original (first approved) baseline so the agreed plan can never be changed |
+
+## Migrations
+
+Applied automatically, in order, by `scripts/db-migrate.js` on every start (already-applied ones are skipped).
+
+1. `20261117000000_init`
+1. `20261118000000_support_desk`
+1. `20261118100000_user_profile`
+1. `20261118200000_original_plan`
+1. `20261119000000_auto_schedule`
+1. `20261120000000_project_director`
 
 ## Organisation, users and security
 
@@ -300,7 +320,7 @@ Indexes: unique ("userId", "dedupeKey"); ("userId", "readAt", "createdAt")
 
 ### Project
 
-A project: code, client, manager, dates, status, health, budget, hourly rate, client visibility, optimistic-lock version.
+A project: code, client, manager, dates, status, health, budget, hourly rate, client visibility, plan approval (planApprovedAt/By), optimistic-lock version.
 
 | Column | Type | Null | Default | Key / reference |
 |---|---|---|---|---|
@@ -329,6 +349,13 @@ A project: code, client, manager, dates, status, health, budget, hourly rate, cl
 | `version` | integer | no | `1` |  |
 | `createdAt` | timestamptz | no | `CURRENT_TIMESTAMP` |  |
 | `updatedAt` | timestamptz | no |  |  |
+| `planApprovedAt` | timestamptz | yes |  |  |
+| `planApprovedById` | uuid | yes |  |  |
+| `directorId` | uuid | yes |  |  |
+| `planSubmittedAt` | timestamptz | yes |  |  |
+| `planSubmittedById` | uuid | yes |  |  |
+| `planReturnedAt` | timestamptz | yes |  |  |
+| `planReturnNote` | text | yes |  |  |
 
 Indexes: unique ("organizationId", code); ("organizationId", status)
 
@@ -429,6 +456,7 @@ Modules, tasks, subtasks and milestones: hierarchy, assignee, status, priority, 
 | `createdById` | uuid | yes |  |  |
 | `createdAt` | timestamptz | no | `CURRENT_TIMESTAMP` |  |
 | `updatedAt` | timestamptz | no |  |  |
+| `startConstraint` | date | yes |  |  |
 
 Indexes: ("assigneeId"); unique ("projectId", number); ("projectId", "parentId"); ("projectId", "phaseId")
 
@@ -471,7 +499,7 @@ Indexes: unique ("predecessorId", "successorId"); ("projectId")
 
 ### Baseline
 
-Saved snapshots of the plan.
+Saved copies of the plan. kind = ORIGINAL (the approved plan: one per project, locked by a trigger), REVISION (re-plan after an approved change request) or SNAPSHOT.
 
 | Column | Type | Null | Default | Key / reference |
 |---|---|---|---|---|
@@ -481,10 +509,14 @@ Saved snapshots of the plan.
 | `note` | text | yes |  |  |
 | `createdById` | uuid | no |  |  |
 | `createdAt` | timestamptz | no | `CURRENT_TIMESTAMP` |  |
+| `kind` | text | no | `'SNAPSHOT'::text` |  |
+| `changeRequestId` | uuid | yes |  |  |
+
+Indexes: unique ("projectId") WHERE (kind = 'ORIGINAL'::text)
 
 ### BaselineItem
 
-Dates/estimates of each work item in a baseline.
+Each work item in a baseline: title, type, phase, owner, dates and estimate at the time it was saved.
 
 | Column | Type | Null | Default | Key / reference |
 |---|---|---|---|---|
@@ -494,6 +526,11 @@ Dates/estimates of each work item in a baseline.
 | `plannedStart` | date | yes |  |  |
 | `plannedFinish` | date | yes |  |  |
 | `estimateHours` | numeric(8,2) | yes |  |  |
+| `title` | text | yes |  |  |
+| `type` | text | yes |  |  |
+| `assigneeId` | uuid | yes |  |  |
+| `phaseId` | uuid | yes |  |  |
+| `parentId` | uuid | yes |  |  |
 
 Indexes: unique ("baselineId", "workItemId")
 
@@ -507,7 +544,7 @@ Working days/hours and time zone used for scheduling and SLA clocks.
 | `organizationId` | uuid | no |  | → `Organization.id` (on delete cascade) |
 | `name` | text | no |  |  |
 | `timezone` | text | no | `'UTC'::text` |  |
-| `workDays` | int4[] | no | `ARRAY[1, 2, 3, 4, 5]` |  |
+| `workDays` | integer[] | no | `ARRAY[1, 2, 3, 4, 5]` |  |
 | `dayStart` | text | no | `'09:00'::text` |  |
 | `dayEnd` | text | no | `'17:00'::text` |  |
 | `isDefault` | boolean | no | `false` |  |
