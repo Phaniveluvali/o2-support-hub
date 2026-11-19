@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: o2-support-config
+  namespace: o2-support
+data:
+  NODE_ENV: "production"
+  PORT: "4000"
+  APP_ORIGIN: "https://tecnics-internal.online/o2"
+  CORS_ORIGINS: "https://tecnics-internal.online"
+  COOKIE_SECURE: "true"
+  TRUST_PROXY: "1"
+  STORAGE_DRIVER: "db"
+  JOBS_ENABLED: "true"
+  LOG_LEVEL: "info"
+  APP_NAME: "O2 Support Hub"
