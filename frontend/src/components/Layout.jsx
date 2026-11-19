@@ -9,8 +9,8 @@ import { connectLive, disconnectLive, useLive, useLiveStatus } from '../lib/live
 import { Avatar, StatusBadge, ProjectDot, ProjectChip, useToast } from './ui.jsx';
 
 export const APP_NAME = 'O2 Support Hub';
-export const BrandMark = () => <img src="/logo-mark.png" className="brand-mark-img" alt="" aria-hidden="true" />;
-export const BrandLogo = ({ className = '' }) => <img src="/logo.png" className={`brand-logo ${className}`} alt={APP_NAME} />;
+export const BrandMark = () => <img src={`${import.meta.env.BASE_URL}logo-mark.png`} className="brand-mark-img" alt="" aria-hidden="true" />;
+export const BrandLogo = ({ className = '' }) => <img src={`${import.meta.env.BASE_URL}logo.png`} className={`brand-logo ${className}`} alt={APP_NAME} />;
 
 function NavItem({ to, icon: Icon, children, end, count, hot }) {
   return <NavLink to={to} end={end} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}><Icon size={16} aria-hidden="true" /><span className="truncate">{children}</span>{count > 0 && <span className={`count ${hot ? 'hot' : ''}`}>{count}</span>}</NavLink>;
